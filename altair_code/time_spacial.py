@@ -9,20 +9,9 @@ from src.MNViz_colors import *
 
 import streamlit as st
 
-def geographic_alt(familia):
+def geographic_alt(NewTable, familia, time):
     # disabling rows limit
     alt.data_transformers.disable_max_rows()
-
-
-    # ## Importing data...
-
-    NewTable = pd.read_csv('./data/treated_db.csv', sep=';', encoding='utf-8-sig', low_memory=False)
-
-
-
-
-    ordens = list(cores_ordem.keys())
-    cores = list(cores_ordem.values())
 
     # corrects a typo (Améica do Sul)
     NewTable['continente'] = NewTable['continente'].apply(lambda x: 'América do Sul' if x=='Améica do Sul' else x)
@@ -45,6 +34,7 @@ def geographic_alt(familia):
 
     # database
     db = NewTable.copy()
+    db = db.where(db['ano_coleta'] <= time)
     db['type_status'] = db['type_status'].astype(str)  # parsing into string to make selector work
     tipos = db['type_status'].unique()
 

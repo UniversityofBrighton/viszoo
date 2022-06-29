@@ -11,16 +11,14 @@ from src.MNViz_colors import *
 
 import streamlit as st
 
-def altitude_alt(familia):
+def altitude_alt(NewTable, familia, time):
 
   alt.data_transformers.disable_max_rows()
-
-  NewTable = pd.read_csv('./data/treated_db.csv', sep=';', encoding='utf-8', low_memory= False)
-
 
   # subsetting
   teste = NewTable[['altitude','familia','ordem','subordem', 'ano_coleta', 'qualificador_atual', 'numero_catalogo', 
                     'genero_atual', 'especie_atual', 'subespecie_atual']].copy()
+  teste = teste.where(teste['ano_coleta'] <= time)
 
   # sorting
   teste = teste.sort_values(['altitude','familia'])
