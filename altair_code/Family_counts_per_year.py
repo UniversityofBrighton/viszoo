@@ -24,40 +24,35 @@ from itertools import compress
 
 def family_count_alt(NewTable, familia, time1, time2):
 
+    alt.renderers.enable('default')
     alt.data_transformers.disable_max_rows()
-
-    orders = NewTable.groupby(['ano_coleta','ordem']).count()['class'].reset_index().rename(columns={'class':'counts'})
-
-    orders.sort_values(['ano_coleta','ordem'], inplace=True)  # ordering
-
-    # dropping remaining NaN's
-    orders = orders.dropna(subset=['ordem'])
 
     teste = NewTable.groupby(['familia','ano_coleta']).count()['class'].reset_index().rename(
                                                                                         columns={'class':'counts'})
-
-    teste['ano_coleta'] = teste['ano_coleta'].astype(int)
     teste = teste.where((teste['ano_coleta'] <= time2) & (teste['ano_coleta'] >= time1))
+
+    teste = teste.dropna(subset=['ano_coleta'])
+    teste['familia'] = teste['familia'].astype(str)
+    teste['ano_coleta'] = teste['ano_coleta'].astype(int)
 
     familias = list(cores_familia.keys())
     new_fam = list(compress(familias, familia))
 
-    color_pal = alt.condition(alt.FieldOneOfPredicate("familia",new_fam), alt.Color('familia', title= 'Family',
-                        legend= None,
-                        scale= alt.Scale(domain= list(cores_familia.keys()), range=list(cores_familia.values()))), alt.value('lightgray'))
+    color_pal = alt.condition(alt.FieldOneOfPredicate("familia",new_fam), alt.Color('familia:O', title= 'Family',
+                        legend= None, scale= alt.Scale(domain= list(cores_familia.keys()), range=list(cores_familia.values()))), alt.value('lightgray'))
 
 
     g1 = alt.Chart(teste,
                 width=800, height=500, title='Number of collected specimens of each family per year').mark_circle(
                                                                                     size=60).encode(
-        x= alt.X('ano_coleta', title='Collected Year'),
+        x= alt.X('ano_coleta', title='Collected Year', scale=alt.Scale(domain=(time1,time2))),
         y= alt.Y('familia', type='nominal', title='Family',
                 sort= alt.EncodingSortField(field='counts', op='count', order='descending')),
         size= alt.Size('counts', title='Counts',
                     legend= None),
         color = color_pal,
         tooltip = alt.Tooltip(['familia', 'ano_coleta', 'counts'])
-    )
+    ).interactive()
 
     g1 = g1.configure_title(fontSize=16).configure_axis(
         labelFontSize=12,
@@ -68,3 +63,5 @@ def family_count_alt(NewTable, familia, time1, time2):
     )
 
     return g1
+
+# %%
