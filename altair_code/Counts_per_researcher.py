@@ -18,10 +18,6 @@ def researchers_alt(NewTable, familia, time1, time2):
     # disabling rows limit
     alt.data_transformers.disable_max_rows()
 
-
-    ordens = list(cores_ordem.keys())
-    cores = list(cores_ordem.values())
-
     teste1 = NewTable.groupby(['collector_full_name','ano_coleta', 'familia']).count()['class'].reset_index().rename(columns=
                                                                                                 {'class':'counts'})
     teste1 = teste1.where((teste1['ano_coleta'] <= time2) & (teste1['ano_coleta'] >= time1))

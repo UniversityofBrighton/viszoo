@@ -20,6 +20,7 @@ import pandas as pd
 # visualization
 import altair as alt
 from src.MNViz_colors import *
+from itertools import compress
 
 def family_count_alt(NewTable, familia, time1, time2):
 
@@ -38,13 +39,12 @@ def family_count_alt(NewTable, familia, time1, time2):
     teste['ano_coleta'] = teste['ano_coleta'].astype(int)
     teste = teste.where((teste['ano_coleta'] <= time2) & (teste['ano_coleta'] >= time1))
 
-    # In[30]:
-    if familia != 'all':
-            color_pal = alt.condition(alt.datum.familia == familia, alt.value('red'), alt.value('lightgray'))
-    else:
-        color_pal = alt.Color('familia', title= 'Family',
+    familias = list(cores_familia.keys())
+    new_fam = list(compress(familias, familia))
+
+    color_pal = alt.condition(alt.FieldOneOfPredicate("familia",new_fam), alt.Color('familia', title= 'Family',
                         legend= None,
-                        scale= alt.Scale(domain= list(cores_familia.keys()), range=list(cores_familia.values())))
+                        scale= alt.Scale(domain= list(cores_familia.keys()), range=list(cores_familia.values()))), alt.value('lightgray'))
 
 
     g1 = alt.Chart(teste,
