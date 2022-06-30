@@ -9,16 +9,16 @@ import altair as alt
 
 from src.MNViz_colors import *
 
-import streamlit as st
+from itertools import compress
 
-def altitude_alt(NewTable, familia, time):
+def altitude_alt(NewTable, familia, time1, time2):
 
   alt.data_transformers.disable_max_rows()
 
   # subsetting
   teste = NewTable[['altitude','familia','ordem','subordem', 'ano_coleta', 'qualificador_atual', 'numero_catalogo', 
                     'genero_atual', 'especie_atual', 'subespecie_atual']].copy()
-  teste = teste.where(teste['ano_coleta'] <= time)
+  teste = teste.where((teste['ano_coleta'] <= time2) & (teste['ano_coleta'] >= time1))
 
   # sorting
   teste = teste.sort_values(['altitude','familia'])
@@ -39,13 +39,13 @@ def altitude_alt(NewTable, familia, time):
   ordens = list(cores_ordem.keys())
   cores = list(cores_ordem.values())
 
-  if familia != 'all':
-    color_pal = alt.condition(alt.datum.familia == familia, alt.value('red'), alt.value('lightgray'))
-  else:
-    color_pal = alt.Color('familia:N', title= 'Family', 
-                     legend = None,
-                     scale=alt.Scale(domain= list(cores_familia.keys()), 
-                                     range= list(cores_familia.values())))
+  familias = list(cores_familia.keys())
+  new_fam = list(compress(familias, familia))
+
+  color_pal = alt.condition(alt.FieldOneOfPredicate("familia",new_fam), alt.Color('familia:N', title= 'Family', 
+                    legend = None,
+                    scale=alt.Scale(domain= list(cores_familia.keys()), 
+                                    range= list(cores_familia.values()))), alt.value('lightgray'))
 
   temp = alt.Chart(db, title='Altitude per family').mark_circle().encode(
       x = alt.X('familia', type='nominal', title='Family', 

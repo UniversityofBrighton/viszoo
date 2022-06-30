@@ -29,35 +29,47 @@ max_year = int(max(years))
 graphs_time = dict()
 
 graphs_time['researchers'] = researchers_alt
-graphs_time['counts'] = count_alt
-graphs_time['counts2'] = family_count_alt
+#graphs_time['counts'] = count_alt
+graphs_time['family count'] = family_count_alt
 
 graphs_space = dict()
 
 graphs_space['altitude'] = altitude_alt
 graphs_space['geographic'] = geographic_alt
 
-col1, col2 = st.columns((3,1))
+time_col1, = st.columns(1)
 
-my_expander = st.sidebar.expander(label='change graph')
-with my_expander:
-  create_chart_time = graphs_time[st.selectbox(label='graph 1', options=list(graphs_time.keys()))]
-  create_chart_space = graphs_space[st.selectbox(label='graph 2', options=list(graphs_space.keys()))]
+st.sidebar.title('VISUALISATION TOOL')
+
+create_chart_time = graphs_time[st.sidebar.selectbox(label='choose a time graph', options=list(graphs_time.keys()))]
+#create_chart_space = graphs_space[st.sidebar.selectbox(label='graph 2', options=list(graphs_space.keys()))]
 
 familias = list(cores_familia.keys())
-familias.append('all')
-familia = st.sidebar.selectbox(label='familia selector', options=familias, index=len(familias)-1)
+familias_color = cores_familia
+selected_familias = list()
 
-time = st.sidebar.slider(label='time selector', min_value= min_year, max_value= max_year, value=max_year)
+time1, time2 = st.sidebar.slider(label='time selector', min_value= min_year, max_value= max_year, value=(min_year, max_year))
+
+familia_container = st.sidebar.container()
+
+familia_container.title('familia selector')
+
+for fam in familias:
+  familia_container.markdown('<div style="background-color: {}; border-radius:15px; display:inline-block; vertical-align:middle; height:10px; width:10px;"></div><div style="display:inline-block; padding-left:15px;">  {}</div>'.format(cores_familia[fam],fam), unsafe_allow_html=True)
+  selected_familias.append(familia_container.checkbox(label="", value=True, key='check_{}'.format(fam)))
 
 
-chart_time = create_chart_time(NewTable, familia, time)
-chart_space = create_chart_space(NewTable, familia, time)
+chart_time = create_chart_time(NewTable, selected_familias, time1, time2)
+chart_space1 = altitude_alt(NewTable, selected_familias, time1, time2)
+chart_space2 = geographic_alt(NewTable, selected_familias, time1, time2)
 
-col1.altair_chart(chart_time, True)
-col1.altair_chart(chart_space, True)
+time_col1.altair_chart(chart_time, True)
 
-st.title('VISUALISATION TOOL')
+space_col1, space_col2 = st.columns((1,1))
+
+space_col1.altair_chart(chart_space1, True)
+
+space_col2.altair_chart(chart_space2, True)
 
 
 

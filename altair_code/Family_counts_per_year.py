@@ -21,7 +21,7 @@ import pandas as pd
 import altair as alt
 from src.MNViz_colors import *
 
-def family_count_alt(NewTable, familia, time):
+def family_count_alt(NewTable, familia, time1, time2):
 
     alt.data_transformers.disable_max_rows()
 
@@ -36,7 +36,7 @@ def family_count_alt(NewTable, familia, time):
                                                                                         columns={'class':'counts'})
 
     teste['ano_coleta'] = teste['ano_coleta'].astype(int)
-    teste = teste.where(teste['ano_coleta'] <= time)
+    teste = teste.where((teste['ano_coleta'] <= time2) & (teste['ano_coleta'] >= time1))
 
     # In[30]:
     if familia != 'all':
@@ -50,7 +50,7 @@ def family_count_alt(NewTable, familia, time):
     g1 = alt.Chart(teste,
                 width=800, height=500, title='Number of collected specimens of each family per year').mark_circle(
                                                                                     size=60).encode(
-        x= alt.X('ano_coleta', type='ordinal', title='Collected Year'),
+        x= alt.X('ano_coleta', title='Collected Year'),
         y= alt.Y('familia', type='nominal', title='Family',
                 sort= alt.EncodingSortField(field='counts', op='count', order='descending')),
         size= alt.Size('counts', title='Counts',

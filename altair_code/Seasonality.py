@@ -4,8 +4,11 @@ import pandas as pd
 
 # pacote para visualização principal
 import altair as alt
+from src.MNViz_colors import *
 
-def count_alt(NewTable, familia, time):
+from itertools import compress
+
+def count_alt(NewTable, familia, time1, time2):
 
     # desabilitando limite de linhas
     alt.data_transformers.disable_max_rows()
@@ -13,7 +16,7 @@ def count_alt(NewTable, familia, time):
 
     # droping NAN
     counts = NewTable.dropna(subset=['ano_coleta', 'mes_coleta'], how='all')
-    counts = counts.where(counts['ano_coleta'] <= time)
+    counts = counts.where((counts['ano_coleta'] <= time2) & (counts['ano_coleta'] >= time1))
     # grouping per time and order
     counts = counts.groupby(['ano_coleta', 'mes_coleta', 'ordem']).count()['class'].reset_index().rename(
                                                                                 columns={'class':'counts'})
@@ -25,13 +28,10 @@ def count_alt(NewTable, familia, time):
     # scale for x axis
     anos = counts['ano_coleta'].unique()
 
+    familias = list(cores_familia.keys())
+    new_fam = list(compress(familias, familia))
 
-    # In[12]:
-
-    if familia != 'all':
-            color_pal = alt.condition(alt.datum.familia == familia, alt.value('red'), alt.value('lightgray'))
-    else:
-        color_pal = alt.Color('counts', title='Counts', legend=None)
+    color_pal = alt.condition(alt.FieldOneOfPredicate("familia",new_fam), alt.Color('counts', title='Counts', legend=None), alt.value('lightgray'))
 
     temp = alt.Chart(counts[(~counts['ordem'].isna()) & (counts['ordem'] != 'Caudata')], 
                     title='Total of collected specimens per month/year',

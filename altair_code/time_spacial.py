@@ -6,10 +6,11 @@ import altair as alt
 
 # importing customized color palettes
 from src.MNViz_colors import *
+from itertools import compress
 
 import streamlit as st
 
-def geographic_alt(NewTable, familia, time):
+def geographic_alt(NewTable, familia, time1, time2):
     # disabling rows limit
     alt.data_transformers.disable_max_rows()
 
@@ -34,20 +35,17 @@ def geographic_alt(NewTable, familia, time):
 
     # database
     db = NewTable.copy()
-    db = db.where(db['ano_coleta'] <= time)
+    db = db.where((db['ano_coleta'] <= time2) & (db['ano_coleta'] >= time1))
     db['type_status'] = db['type_status'].astype(str)  # parsing into string to make selector work
     tipos = db['type_status'].unique()
 
-    # seletores
-    select_order = alt.selection_multi(fields=['familia'], bind='legend')
-    select_type = alt.selection_multi(fields=['type_status'], bind='legend')
+    familias = list(cores_familia.keys())
+    new_fam = list(compress(familias, familia))
 
-    if familia != 'all':
-        color_pal = alt.condition(alt.datum.familia == familia, alt.value('red'), alt.value('lightgray'))
-    else:
-        color_pal = alt.Color('familia:N', title='Family', 
+    color_pal = alt.condition(alt.FieldOneOfPredicate("familia",new_fam),alt.Color('familia:N', title='Family', 
                         legend=None, 
-                        scale= alt.Scale(domain= list(cores_familia.keys()), range= list(cores_familia.values())))
+                        scale= alt.Scale(domain= list(cores_familia.keys()), range= list(cores_familia.values()))),
+                        alt.value('lightgray'))
 
     teste = alt.Chart(db).mark_point(filled=True).encode(
         longitude = alt.X('long:Q', title='Longitude'),
@@ -57,8 +55,7 @@ def geographic_alt(NewTable, familia, time):
                         legend=None),
         tooltip = alt.Tooltip(['lat','long','pais','regiao','estado_ou_provincia',
                             'ano_coleta','mes_coleta', 'genero_atual','ordem', 'familia', 'type_status'])
-    ).project(type='naturalEarth1').add_selection(select_order, 
-                                select_type).transform_filter(select_order).transform_filter(select_type)
+    ).project(type='naturalEarth1')
 
     temp = (world + teste).configure_title(fontSize=16).configure_axis(
         labelFontSize=12,
