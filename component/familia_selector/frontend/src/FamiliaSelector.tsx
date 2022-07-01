@@ -56,7 +56,7 @@ class FamiliaSelector extends StreamlitComponentBase {
     var themeBackgroundColor = "blue"
      if (theme) {
       primaryColor = theme.primaryColor
-      themeBackgroundColor = theme.backgroundColor
+      themeBackgroundColor = theme.secondaryBackgroundColor
      }
 
     return (
