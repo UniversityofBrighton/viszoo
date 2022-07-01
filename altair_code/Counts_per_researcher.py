@@ -47,7 +47,7 @@ def researchers_alt(NewTable, familia, time1, time2):
         x= alt.X('ano_coleta', title='Sampling Year', scale=alt.Scale(domain=(time1,time2))),
         y= alt.Y('collector_full_name', type='nominal', title='Collector Name', 
     #              scale= alt.Scale(domain= y_labels),
-                sort= sort_list[50:900]),
+                sort= sort_list[0:50]),
         order= alt.Order('counts', sort='descending'),  # smaller points in front
         color= color_pal,
         tooltip= alt.Tooltip(['collector_full_name', 'ano_coleta', 'counts', 'familia'])
