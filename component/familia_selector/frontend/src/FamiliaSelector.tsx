@@ -53,12 +53,14 @@ class FamiliaSelector extends StreamlitComponentBase {
 
     const { theme } = this.props
     var primaryColor = "blue"
+    var themeBackgroundColor = "blue"
      if (theme) {
       primaryColor = theme.primaryColor
+      themeBackgroundColor = theme.backgroundColor
      }
 
     return (
-      <div style={{width:250, margin:0, padding:0,backgroundColor:"gray",borderRadius:12}}>
+      <div style={{width:250, margin:0, padding:0,backgroundColor:themeBackgroundColor,borderRadius:12}}>
         <div style={{height:300,overflowY:"scroll",borderRadius:10, paddingLeft:10,}}>
           {familias_disp}
         </div>
