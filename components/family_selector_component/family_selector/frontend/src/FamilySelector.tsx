@@ -9,7 +9,7 @@ import React, { ReactNode,  } from "react"
  * This is a React-based component template. The `render()` function is called
  * automatically when your component should be re-rendered.
  */
-class FamiliaSelector extends StreamlitComponentBase {
+class FamilySelector extends StreamlitComponentBase {
 
   public state = {familias: this.props.args["familias"]}
 
@@ -109,5 +109,5 @@ class FamiliaSelector extends StreamlitComponentBase {
 // passing arguments from Python -> Component.
 //
 // You don't need to edit withStreamlitConnection (but you're welcome to!).
-export default withStreamlitConnection(FamiliaSelector)
+export default withStreamlitConnection(FamilySelector)
 

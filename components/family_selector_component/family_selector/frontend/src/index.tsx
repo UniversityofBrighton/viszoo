@@ -1,10 +1,10 @@
 import React from "react"
 import ReactDOM from "react-dom"
-import FamiliaSelector from "./FamiliaSelector"
+import FamilySelector from "./FamilySelector"
 
 ReactDOM.render(
   <React.StrictMode>
-    <FamiliaSelector />
+    <FamilySelector />
   </React.StrictMode>,
   document.getElementById("root")
 )

@@ -1,7 +1,7 @@
 import setuptools
 
 setuptools.setup(
-    name="streamlit-familia-selector",
+    name="streamlit-family-selector",
     version="0.0.1",
     author="",
     author_email="",

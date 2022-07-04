@@ -32,7 +32,7 @@ if 'first_load' not in st.session_state:
 
   # loading my components
   root_dir = os.path.dirname(os.path.abspath(__file__))
-  build_dir = os.path.join(root_dir, "component"+os.sep+"familia_selector"+os.sep+"frontend"+os.sep+"build")
+  build_dir = os.path.join(root_dir, "components"+os.sep+"family_selector_component"+os.sep+"family_selector"+os.sep+"frontend"+os.sep+"build")
 
   st.session_state['family_selector'] = components.declare_component(
     "familia_selector",
@@ -90,17 +90,17 @@ graphs_space['altitude'] = altitude_alt
 graphs_space['geographic'] = geographic_alt
 
 
+if 'file_uploaded' not in st.session_state:
+  # handling file upload
+  with st.sidebar:
+    file = st.file_uploader(label='upload a file', type=['csv'], accept_multiple_files=False)
+    if file != None:
+      data = pd.read_csv(file, sep=';', encoding='utf-8-sig', low_memory= False)
+      st.session_state['file_uploaded'] = 'oui'
+
 
 selectors = st.sidebar.container()
-
-# handling file upload
-file = st.sidebar.file_uploader(label='upload a file', type=['csv'], accept_multiple_files=False)
-if file != None:
-  data = pd.read_csv(file, sep=';', encoding='utf-8-sig', low_memory= False)
-
-
 with selectors:
-  st.title('VISUALISATION TOOL')
   st.title('familia selector')
   list_families = family_selector(list_families)
 
@@ -112,23 +112,28 @@ for fam in list_families:
 
 
 #main layout
-select1, _ ,select2 = st.columns((3,1,3))
-time_col1, = st.columns(1)
+title_col, _ = st.columns((4,1))
 space_col1, space_col2 = st.columns((1,1))
+select1, select2 = st.columns(2)
+time_col1, = st.columns(1)
+
+with title_col:
+  st.title('VISUALISATION TOOL')
+
 
 # selectors in main
 with select1:
-  create_chart_time = graphs_time[st.selectbox(label='choose a time graph', options=list(graphs_time.keys()))]
+  time1, time2 = st.slider(label='time selector', min_value= min_year, max_value= max_year, value=(default_min_year, max_year))
 with select2:
-  time1, time2 = select2.slider(label='time selector', min_value= min_year, max_value= max_year, value=(default_min_year, max_year))
+  create_chart_time = graphs_time[st.selectbox(label='choose a time graph', options=list(graphs_time.keys()))]
 
 
 #chart creation
 filtered_data = filter_data(data, families_filter_out, time1, time2)
 
 chart_time = create_chart_time(filtered_data, (time1,time2))
-chart_space1 = altitude_alt(filtered_data)
-chart_space2 = geographic_alt(filtered_data)
+chart_space1 = geographic_alt(filtered_data)
+chart_space2 = altitude_alt(filtered_data)
 
 #graphs drawing
 time_col1.altair_chart(chart_time, True)
