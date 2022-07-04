@@ -1,10 +1,10 @@
 import React from "react"
 import ReactDOM from "react-dom"
-import MyComponent from "./MyComponent"
+import TypeSelector from "./TypeSelector"
 
 ReactDOM.render(
   <React.StrictMode>
-    <MyComponent />
+    <TypeSelector />
   </React.StrictMode>,
   document.getElementById("root")
 )

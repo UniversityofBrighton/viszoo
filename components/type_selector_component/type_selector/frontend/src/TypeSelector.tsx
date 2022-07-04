@@ -9,44 +9,63 @@ import React, { ReactNode,  } from "react"
  * This is a React-based component template. The `render()` function is called
  * automatically when your component should be re-rendered.
  */
-class FamilySelector extends StreamlitComponentBase {
+class TypeSelector extends StreamlitComponentBase {
 
-  public state = {familias: this.props.args["familias"]}
+  public state = {types: this.props.args["types"]}
 
   public render = (): ReactNode => {
     // Arguments that are passed to the plugin in Python are accessible
     // via `this.props.args`. Here, we access the "name" arg.
 
-    const familias = this.state.familias
+    const types = this.state.types
 
-    const familias_disp = familias.map((fam: { [x: string]: any }, index: number) => {
-      if (fam["selected"] === true) {
-        return (
-        <div>
-          <div 
-            style={{height:12,width:12,borderRadius:15,backgroundColor:fam["color"],display:"inline-block",cursor:'pointer'}}
-            onClick={() => this.onClicked(familias, index)} >
-          </div>
-          <div style={{display:"inline-block", paddingLeft:10}}>
-            {fam["name"]}
-          </div>
+    const type_disp = types.map((typ: { [x: string]: any }, index: number) => {
+      var selectColor
+      if (typ["selected"] === true) {
+        selectColor = 'black'
+      }
+      else{
+        selectColor = 'lightgray'
+      }
+
+      var styleShape
+      styleShape = {height:12,width:12, display:'inline-block',cursor:'pointer'}
+      if (typ["shape"] === 'circle') {
+        styleShape = {...styleShape,borderRadius:15, backgroundColor:selectColor}
+      }
+      if (typ["shape"] === 'triangle') {
+        styleShape = {
+          width: 0,
+          height: 0,
+          backgroundColor: "transparent",
+          borderStyle: "solid",
+          borderTopWidth: 0,
+          borderLeftWidth: 6,
+          borderRightWidth: 6,
+          borderBottomWidth: 12,
+          borderLeftColor: "transparent",
+          borderRightColor: "transparent",
+          borderBottomColor: selectColor,
+          display:'inline-block',
+          cursor:'pointer'
+        }
+      }
+      if (typ["shape"] === 'square'){
+        styleShape = {...styleShape, backgroundColor:selectColor}
+      }
+
+      return (
+      <div>
+        <div 
+          style={{...styleShape}}
+          onClick={() => this.onClicked(types, index)} >
         </div>
-        )
+        <div style={{display:"inline-block", paddingLeft:10}}>
+          {typ["name"]}
+        </div>
+      </div>
+      )
       }
-      else {
-        return (
-          <div>
-            <div 
-              style={{height:12,width:12,borderRadius:15,backgroundColor:"lightgray",display:"inline-block",}}
-              onClick={() => this.onClicked(familias, index)} >
-            </div>
-            <div style={{display:"inline-block", paddingLeft:10}}>
-              {fam["name"]}
-            </div>
-          </div>
-        )
-      }
-    }
 
       
     );
@@ -63,8 +82,8 @@ class FamilySelector extends StreamlitComponentBase {
 
     return (
       <div style={{width:250, margin:0, padding:0,backgroundColor:themeBackgroundColor,borderRadius:12}}>
-        <div style={{height:250,overflowY:"scroll",borderRadius:10, paddingLeft:10,}}>
-          {familias_disp}
+        <div style={{height:170,overflowY:"scroll",borderRadius:10, paddingLeft:10,}}>
+          {type_disp}
         </div>
         <div style={{flexDirection:'row', display:'flex'}}>
           <div style={{...styleButton,borderTopLeftRadius:10, marginRight:2}} onClick={() => this.onSelect(false)}>
@@ -74,7 +93,7 @@ class FamilySelector extends StreamlitComponentBase {
             <p style={{fontSize:15,textAlign:'center'}}>select all</p>
           </div>
         </div>
-        <div style={{...styleButton,borderBottomRightRadius:10,borderBottomLeftRadius:10, marginTop:4}} onClick={() => this.onFilter(familias)}>
+        <div style={{...styleButton,borderBottomRightRadius:10,borderBottomLeftRadius:10, marginTop:4}} onClick={() => this.onFilter()}>
           <p style={{paddingLeft:15,fontSize:15,textAlign:'center',}}>filter</p>
         </div>
       </div>
@@ -82,21 +101,21 @@ class FamilySelector extends StreamlitComponentBase {
   }
 
   /** Click handler for our "Click Me!" button. */
-  private onClicked = (familias: any, index:number) => {
+  private onClicked = (types: any, index:number) => {
     // Increment state.numClicks, and pass the new value back to
     // Streamlit via `Streamlit.setComponentValue`.
-    familias[index]["selected"] = !familias[index]["selected"]
-    this.setState({familias: familias})
+    types[index]["selected"] = !types[index]["selected"]
+    this.setState({types: types})
     this.forceUpdate()
   }
 
-  private onFilter = (familias: any) => {
-    Streamlit.setComponentValue(familias)
+  private onFilter = () => {
+    Streamlit.setComponentValue(this.state.types)
     this.forceUpdate()
   }
 
   private onSelect = (bool: boolean) => {
-    this.state.familias.forEach((fam:any) => {
+    this.state.types.forEach((fam:any) => {
       fam['selected'] = bool
     });
     this.forceUpdate()
@@ -109,5 +128,5 @@ class FamilySelector extends StreamlitComponentBase {
 // passing arguments from Python -> Component.
 //
 // You don't need to edit withStreamlitConnection (but you're welcome to!).
-export default withStreamlitConnection(FamilySelector)
+export default withStreamlitConnection(TypeSelector)
 
