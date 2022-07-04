@@ -24,7 +24,7 @@ class FamiliaSelector extends StreamlitComponentBase {
         return (
         <div>
           <div 
-            style={{height:12,width:12,borderRadius:15,backgroundColor:fam["color"],display:"inline-block",}}
+            style={{height:12,width:12,borderRadius:15,backgroundColor:fam["color"],display:"inline-block",cursor:'pointer'}}
             onClick={() => this.onClicked(familias, index)} >
           </div>
           <div style={{display:"inline-block", paddingLeft:10}}>
@@ -59,15 +59,23 @@ class FamiliaSelector extends StreamlitComponentBase {
       themeBackgroundColor = theme.secondaryBackgroundColor
      }
 
+    const styleButton = {height:40, backgroundColor: primaryColor,paddingTop:10,flex:1,cursor:'pointer'}
+
     return (
       <div style={{width:250, margin:0, padding:0,backgroundColor:themeBackgroundColor,borderRadius:12}}>
         <div style={{height:300,overflowY:"scroll",borderRadius:10, paddingLeft:10,}}>
           {familias_disp}
         </div>
-        <div style={{
-          height:40, backgroundColor: primaryColor,borderRadius:10, paddingTop:10,alignContent:'center',
-        }} onClick={() => this.onFilter(familias)}>
-          <p style={{paddingLeft:15,fontSize:15,alignContent:'center'}}>filter</p>
+        <div style={{flexDirection:'row', display:'flex'}}>
+          <div style={{...styleButton,borderTopLeftRadius:10, marginRight:2}} onClick={() => this.onSelect(false)}>
+            <p style={{fontSize:15,textAlign:'center'}}>deselect all</p>
+          </div>
+          <div style={{...styleButton,borderTopRightRadius:10, marginLeft:2}} onClick={() => this.onSelect(true)}>
+            <p style={{fontSize:15,textAlign:'center'}}>select all</p>
+          </div>
+        </div>
+        <div style={{...styleButton,borderBottomRightRadius:10,borderBottomLeftRadius:10, marginTop:4}} onClick={() => this.onFilter(familias)}>
+          <p style={{paddingLeft:15,fontSize:15,textAlign:'center',}}>filter</p>
         </div>
       </div>
     )
@@ -87,6 +95,13 @@ class FamiliaSelector extends StreamlitComponentBase {
     this.forceUpdate()
   }
 
+  private onSelect = (bool: boolean) => {
+    this.state.familias.forEach((fam:any) => {
+      fam['selected'] = bool
+    });
+    this.forceUpdate()
+  }
+
 }
 
 // "withStreamlitConnection" is a wrapper function. It bootstraps the
@@ -95,3 +110,4 @@ class FamiliaSelector extends StreamlitComponentBase {
 //
 // You don't need to edit withStreamlitConnection (but you're welcome to!).
 export default withStreamlitConnection(FamiliaSelector)
+

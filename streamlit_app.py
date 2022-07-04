@@ -4,6 +4,7 @@ import altair as alt
 import pandas as pd
 import numpy as np
 import os
+from data_utils import *
 
 from altair_code.Seasonality import count_alt
 from altair_code.Altitude import altitude_alt
@@ -14,20 +15,31 @@ from altair_code.Counts_per_researcher import researchers_alt
 
 if 'first_load' not in st.session_state:
 
+  # loading families informations and color
   from src.MNViz_colors import *
+  families_name = list(cores_familia.keys())
+  families_color = list(cores_familia.values())
+  list_families = list()
 
+  for index in range(len(families_name)):
+      fam = dict()
+      fam["name"] = families_name[index]
+      fam["color"] = families_color[index]
+      fam["selected"] = True
+      list_families.append(fam)
+
+  st.session_state['list_families'] = list_families
+
+  # loading my components
   root_dir = os.path.dirname(os.path.abspath(__file__))
   build_dir = os.path.join(root_dir, "component"+os.sep+"familia_selector"+os.sep+"frontend"+os.sep+"build")
 
-  st.session_state['familia_selector'] = components.declare_component(
+  st.session_state['family_selector'] = components.declare_component(
     "familia_selector",
     path=build_dir,
   )
 
-  
-
   #loading the pandas csv
-
   data = pd.read_csv('./data/treated_db.csv', sep=';', encoding='utf-8-sig', low_memory= False)
   st.session_state['data'] = data
 
@@ -43,43 +55,33 @@ if 'first_load' not in st.session_state:
   st.session_state['min_year'] = min_year
   st.session_state['max_year'] = max_year
 
-  #options
-  st.set_page_config(layout='wide')
-  st.markdown('<style>#vg-tooltip-element{z-index: 1000051}</style>',
-              unsafe_allow_html=True)
-
-  familias_name = list(cores_familia.keys())
-  familias_color = list(cores_familia.values())
-  list_familias = list()
-
-  for index in range(len(familias_name)):
-    fam = dict()
-    fam["name"] = familias_name[index]
-    fam["color"] = familias_color[index]
-    fam["selected"] = True
-    list_familias.append(fam)
-
-  st.session_state['list_familias'] = list_familias
-
   st.session_state['first_load'] = "oui"
 
 else:
   min_year = st.session_state['min_year']
   max_year = st.session_state['max_year']
-  list_familias = st.session_state['list_familias']
+  list_families = st.session_state['list_families']
   data = st.session_state['data']
 
+
+# declarations
+default_min_year = 1930
+
+
+#options
+st.set_page_config(layout='wide')
+st.markdown('<style>#vg-tooltip-element{z-index: 1000051}</style>',
+          unsafe_allow_html=True)
   
 
-def familia_selector(familias):
-    component_value = st.session_state['familia_selector'](familias = familias, default=familias, key="familia_selector_widget")
+def family_selector(families):
+    component_value = st.session_state['family_selector'](familias = families, default=families, key="family_selector_widget")
     return component_value
 
 #available graphs definition
 graphs_time = dict()
 
 graphs_time['researchers'] = researchers_alt
-#graphs_time['counts'] = count_alt
 graphs_time['family count'] = family_count_alt
 
 graphs_space = dict()
@@ -89,30 +91,44 @@ graphs_space['geographic'] = geographic_alt
 
 
 
-st.sidebar.title('VISUALISATION TOOL')
+selectors = st.sidebar.container()
 
-create_chart_time = graphs_time[st.sidebar.selectbox(label='choose a time graph', options=list(graphs_time.keys()))]
+# handling file upload
+file = st.sidebar.file_uploader(label='upload a file', type=['csv'], accept_multiple_files=False)
+if file != None:
+  data = pd.read_csv(file, sep=';', encoding='utf-8-sig', low_memory= False)
 
-time1, time2 = st.sidebar.slider(label='time selector', min_value= min_year, max_value= max_year, value=(min_year, max_year))
 
-#familia container
-#familia_container = st.sidebar.container()
-
-with st.sidebar:
+with selectors:
+  st.title('VISUALISATION TOOL')
   st.title('familia selector')
-  list_familias = familia_selector(list_familias)
+  list_families = family_selector(list_families)
 
-bool_familias = list(map(lambda x: x['selected'],list_familias))
+families_filter = list(map(lambda x: x['selected'],list_families))
+families_filter_out = list()
+for fam in list_families:
+  if not(fam['selected']):
+    families_filter_out.append(fam['name'])
+
+
+#main layout
+select1, _ ,select2 = st.columns((3,1,3))
+time_col1, = st.columns(1)
+space_col1, space_col2 = st.columns((1,1))
+
+# selectors in main
+with select1:
+  create_chart_time = graphs_time[st.selectbox(label='choose a time graph', options=list(graphs_time.keys()))]
+with select2:
+  time1, time2 = select2.slider(label='time selector', min_value= min_year, max_value= max_year, value=(default_min_year, max_year))
 
 
 #chart creation
-chart_time = create_chart_time(data, bool_familias, time1, time2)
-chart_space1 = altitude_alt(data, bool_familias, time1, time2)
-chart_space2 = geographic_alt(data, bool_familias, time1, time2)
+filtered_data = filter_data(data, families_filter_out, time1, time2)
 
-#graphs layout
-time_col1, = st.columns(1)
-space_col1, space_col2 = st.columns((1,1))
+chart_time = create_chart_time(filtered_data, (time1,time2))
+chart_space1 = altitude_alt(filtered_data)
+chart_space2 = geographic_alt(filtered_data)
 
 #graphs drawing
 time_col1.altair_chart(chart_time, True)

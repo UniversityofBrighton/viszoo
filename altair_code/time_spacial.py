@@ -10,7 +10,7 @@ from itertools import compress
 
 import streamlit as st
 
-def geographic_alt(NewTable, familia, time1, time2):
+def geographic_alt(NewTable):
     # disabling rows limit
     alt.data_transformers.disable_max_rows()
 
@@ -35,22 +35,20 @@ def geographic_alt(NewTable, familia, time1, time2):
 
     # database
     db = NewTable.copy()
-    db = db.where((db['ano_coleta'] <= time2) & (db['ano_coleta'] >= time1))
     db['type_status'] = db['type_status'].astype(str)  # parsing into string to make selector work
     tipos = db['type_status'].unique()
 
-    familias = list(cores_familia.keys())
-    new_fam = list(compress(familias, familia))
-
-    color_pal = alt.condition(alt.FieldOneOfPredicate("familia",new_fam),alt.Color('familia:N', title='Family', 
-                        legend=None, 
-                        scale= alt.Scale(domain= list(cores_familia.keys()), range= list(cores_familia.values()))),
-                        alt.value('lightgray'))
+    #color_pal = alt.condition(alt.FieldOneOfPredicate("familia",new_fam),alt.Color('familia:N', title='Family', 
+    #                    legend=None, 
+    #                    scale= alt.Scale(domain= list(cores_familia.keys()), range= list(cores_familia.values()))),
+    #                    alt.value('lightgray'))
 
     teste = alt.Chart(db).mark_point(filled=True).encode(
         longitude = alt.X('long:Q', title='Longitude'),
         latitude = alt.Y('lat:Q', title='Latitude'),
-        color= color_pal,
+        color= alt.Color('familia:N', title='Family', 
+                        legend=None, 
+                        scale= alt.Scale(domain= list(cores_familia.keys()), range= list(cores_familia.values()))),
         shape = alt.Shape('type_status:N', title='Type', scale= alt.Scale(domain=tipos), 
                         legend=None),
         tooltip = alt.Tooltip(['lat','long','pais','regiao','estado_ou_provincia',
