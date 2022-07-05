@@ -11,7 +11,7 @@ from src.MNViz_colors import *
 
 from itertools import compress
 
-def altitude_alt(NewTable):
+def familyX_altitudeY(NewTable):
 
   alt.data_transformers.disable_max_rows()
 
@@ -50,7 +50,46 @@ def altitude_alt(NewTable):
                                     range= list(cores_familia.values()))),
       tooltip = alt.Tooltip(['numero_catalogo', 'genero_atual','especie_atual','subespecie_atual', 
                               'qualificador_atual', 'ano_coleta','altitude'])
-  ).interactive()
+  )
 
   return temp
+
+
+def genusX_altitudeY(data):
+
+  data = data[['altitude','especie_atual','genero_atual','ordem', 'subordem',
+                 'familia', 'ano_coleta', 'qualificador_atual', 'numero_catalogo', 'subespecie_atual']]
+
+  # dropping na
+  data = data.dropna(subset=['altitude'])
+  # making sure altitude is a floating point number
+  data['altitude'] = data['altitude'].astype(float)
+  # removing outlier
+  data = data[data['altitude'] < 7000].copy()
+
+  # ordering x-axis per mean altitude - OUTLIER: ordem nula
+  graph = alt.Chart(data, title='Altitude per genus',
+                  width= 900, height=300).mark_circle().encode(
+      x = alt.X('genero_atual', type='nominal', title='Genus',
+              sort=alt.EncodingSortField('altitude', op="max", order="ascending")),
+      y = alt.Y('altitude:Q', title='Altitude (in meters)'),
+      color = alt.Color('familia:N', title='Family',
+                      legend=None,
+                      scale= alt.Scale(domain=list(cores_familia.keys()), range= list(cores_familia.values()))),
+      tooltip = alt.Tooltip(['numero_catalogo', 'genero_atual','especie_atual','subespecie_atual', 
+                          'ordem', 'subordem',
+                              'qualificador_atual', 'ano_coleta','altitude'])
+  )
+
+  graph = graph.configure_title(fontSize=16).configure_axis(
+      labelFontSize=12,
+      titleFontSize=12
+  ).configure_legend(
+      labelFontSize=12,
+      titleFontSize=12
+  )
+
+  # g.save('./graphs/altitude/genus/altitude-per-genus.html')
+  # g
+  return graph
 

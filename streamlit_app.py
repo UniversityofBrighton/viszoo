@@ -6,11 +6,12 @@ import numpy as np
 import os
 from data_utils import *
 
-from altair_code.Seasonality import count_alt
-from altair_code.Altitude import altitude_alt
-from altair_code.time_spacial import geographic_alt
-from altair_code.Family_counts_per_year import family_count_alt
-from altair_code.Counts_per_researcher import researchers_alt
+from altair_code.Seasonality import *
+from altair_code.Altitude import *
+from altair_code.time_spacial import *
+from altair_code.Family_counts_per_year import *
+from altair_code.Counts_per_researcher import *
+from altair_code.Type_counts import *
 
 
 
@@ -53,7 +54,7 @@ else:
     build_dir_family = os.path.join(root_dir, "components"+os.sep+"family_selector_component"+os.sep+"family_selector"+os.sep+"frontend"+os.sep+"build")
 
     st.session_state['family_selector'] = components.declare_component(
-      "familia_selector",
+      "family_selector",
       path=build_dir_family,
     )
 
@@ -74,7 +75,10 @@ else:
     list_types = list()
     for index in range(len(type_names)):
       new_type = dict()
-      new_type['name'] = str(type_names[index])
+      if str(type_names[index]) == 'nan':
+        new_type['name'] = 'no type'
+      else:
+        new_type['name'] = str(type_names[index])
       new_type['shape'] = type_shapes[index]
       new_type['selected'] = True
       list_types.append(new_type)
@@ -119,13 +123,27 @@ else:
   #available graphs definition
   graphs_time = dict()
 
-  graphs_time['researchers'] = researchers_alt
-  graphs_time['family count'] = family_count_alt
+  graphs_time['top 50 collector by species collected'] = timeX_collectorY_top50
+  graphs_time['top 50 determiner by species determined'] = timeX_determinerY_top50
+  graphs_time['collector by species collected'] = timeX_collectorY
+  graphs_time['determiner by species determined'] = timeX_determinerY
+  graphs_time['family count'] = timeX_family_countY
+  graphs_time['family types count'] = timeX_family_countTypeY
+  graphs_time['genus types count'] = timeX_genus_countTypeY
+  graphs_time['collector types count'] = timeX_collector_countTypeY
+  graphs_time['order count'] = timeX_order_countY
+  graphs_time['type count'] = timeX_countTypeY
+  graphs_time['families per continent'] = timeX_family_continentY
+  graphs_time['families per country'] = timeX_family_countryY
+  graphs_time['families per brazilian states'] = timeX_family_statesY
+  graphs_time['seasonality'] = timeX_monthY
+
 
   graphs_space = dict()
 
-  graphs_space['altitude'] = altitude_alt
-  graphs_space['geographic'] = geographic_alt        
+  graphs_space['altitude per family'] = familyX_altitudeY
+  graphs_space['altitude per genus'] = genusX_altitudeY
+  graphs_space['geographic representation'] = geographic_alt
 
 
   selectors = st.sidebar.container()
@@ -152,7 +170,7 @@ else:
   #main layout
   title_col, _ = st.columns((4,1))
   space_col1, space_col2 = st.columns((1,1))
-  select1, select2 = st.columns(2)
+  select1, select2, select3 = st.columns((4,2,2))
   time_col1, = st.columns(1)
 
 
@@ -161,14 +179,15 @@ else:
     time1, time2 = st.slider(label='time selector', min_value= min_year, max_value= max_year, value=(default_min_year, max_year))
   with select2:
     create_chart_time = graphs_time[st.selectbox(label='choose a time graph', options=list(graphs_time.keys()))]
-
+  with select3:
+    create_chart_space = graphs_space[st.selectbox(label='choose a spatial graph', options=list(graphs_space.keys()))]
 
   #chart creation
   filtered_data = filter_data(data, families_filter_out, type_filter_out, time1, time2)
 
-  chart_time = create_chart_time(filtered_data, (time1,time2))
+  chart_time = create_chart_time(filtered_data)
   chart_space1 = geographic_alt(filtered_data)
-  chart_space2 = altitude_alt(filtered_data)
+  chart_space2 = create_chart_space(filtered_data)
 
   #graphs drawing
   time_col1.altair_chart(chart_time, True)
