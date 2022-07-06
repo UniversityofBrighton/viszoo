@@ -53,6 +53,7 @@ class TypeSelector extends StreamlitComponentBase {
       if (typ["shape"] === 'square'){
         styleShape = {...styleShape, backgroundColor:selectColor}
       }
+      styleShape = {height:12,width:12, display:'inline-block',cursor:'pointer', backgroundColor:selectColor}
 
       return (
       <div>

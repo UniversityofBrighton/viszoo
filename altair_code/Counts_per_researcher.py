@@ -9,7 +9,7 @@ import altair as alt
 from src.MNViz_colors import *
 
 
-def timeX_collectorY_top50(data):
+def timeX_collectorY_top50(data:pd.DataFrame):
 
     # disabling rows limit
     alt.data_transformers.disable_max_rows()

@@ -2,3 +2,5 @@ altair
 numpy
 pandas
 vega-datasets
+unidecode
+openpyxl

@@ -58,6 +58,7 @@ def timeX_family_countTypeY(NewTable: pd.DataFrame):
     teste = teste.dropna(subset=['ano_coleta'])
     teste['familia'] = teste['familia'].astype(str)
     teste['ano_coleta'] = teste['ano_coleta'].astype(int)
+    teste['type_status'] = teste['type_status'].astype(str)
 
     teste = teste.sort_values(['ano_coleta'])
 
@@ -101,6 +102,12 @@ def timeX_genus_countTypeY(NewTable: pd.DataFrame):
 
         # database
     db = NewTable.groupby(['ano_coleta', 'genero_atual', 'type_status', 'familia']).count()['class'].reset_index().rename(columns={'class':'counts'})
+
+    db = db.dropna(subset=['ano_coleta'])
+    db['familia'] = db['familia'].astype(str)
+    db['ano_coleta'] = db['ano_coleta'].astype(int)
+    db['type_status'] = db['type_status'].astype(str)
+    db['genero_atual'] = db['genero_atual'].astype(str)
 
     sort_list = db.sort_values('ano_coleta')['ano_coleta'].unique()
     time_min = sort_list.min()

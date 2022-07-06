@@ -6,13 +6,13 @@ import numpy as np
 import os
 from data_utils import *
 
+from altair_code.data_treatment import *
 from altair_code.Seasonality import *
 from altair_code.Altitude import *
 from altair_code.time_spacial import *
 from altair_code.Family_counts_per_year import *
 from altair_code.Counts_per_researcher import *
 from altair_code.Type_counts import *
-
 
 
 #options
@@ -24,7 +24,7 @@ st.title('VisZoo Tool')
 
 if 'file_uploaded' not in st.session_state:
 
-  file = st.file_uploader(label='upload your file', type=['csv'], accept_multiple_files=False)
+  file = st.file_uploader(label='upload your file', type=['xlsx'], accept_multiple_files=False)
   if file != None:
     st.session_state['file'] = file
     st.session_state['file_uploaded'] = 'oui'
@@ -66,7 +66,7 @@ else:
     )
 
     #loading the pandas csv
-    data = pd.read_csv(st.session_state['file'], sep=';', encoding='utf-8-sig', low_memory= False)
+    data = excel_to_dataframe(st.session_state['file'])
     st.session_state['data'] = data
 
     # handling types
@@ -75,10 +75,7 @@ else:
     list_types = list()
     for index in range(len(type_names)):
       new_type = dict()
-      if str(type_names[index]) == 'nan':
-        new_type['name'] = 'no type'
-      else:
-        new_type['name'] = str(type_names[index])
+      new_type['name'] = str(type_names[index])
       new_type['shape'] = type_shapes[index]
       new_type['selected'] = True
       list_types.append(new_type)
@@ -161,10 +158,7 @@ else:
   type_filter_out = list()
   for typ in list_types:
     if not(typ['selected']):
-      if typ['name'] == "nan":
-        type_filter_out.append(np.nan)
-      else:
-        type_filter_out.append(typ['name'])
+      type_filter_out.append(typ['name'])
 
 
   #main layout

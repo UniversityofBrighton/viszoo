@@ -6,20 +6,13 @@ import altair as alt
 
 # importing customized color palettes
 from src.MNViz_colors import *
-from itertools import compress
 
 import streamlit as st
 
-def geographic_alt(NewTable):
-    # disabling rows limit
-    alt.data_transformers.disable_max_rows()
+def geographic_alt(NewTable: pd.DataFrame):
 
     # corrects a typo (Améica do Sul)
     NewTable['continente'] = NewTable['continente'].apply(lambda x: 'América do Sul' if x=='Améica do Sul' else x)
-
-
-    # looking good...
-    NewTable['continente'].value_counts()
 
 
     from vega_datasets import data
@@ -31,19 +24,14 @@ def geographic_alt(NewTable):
         stroke='gray'
     ).project('naturalEarth1')
 
-# world
-
-    # database
-    db = NewTable.copy()
-    db['type_status'] = db['type_status'].astype(str)  # parsing into string to make selector work
-    tipos = db['type_status'].unique()
+    tipos = NewTable['type_status'].astype(str).unique()
 
     #color_pal = alt.condition(alt.FieldOneOfPredicate("familia",new_fam),alt.Color('familia:N', title='Family', 
     #                    legend=None, 
     #                    scale= alt.Scale(domain= list(cores_familia.keys()), range= list(cores_familia.values()))),
     #                    alt.value('lightgray'))
 
-    teste = alt.Chart(db).mark_point(filled=True).encode(
+    teste = alt.Chart(NewTable).mark_point(filled=True).encode(
         longitude = alt.X('long:Q', title='Longitude'),
         latitude = alt.Y('lat:Q', title='Latitude'),
         color= alt.Color('familia:N', title='Family', 
@@ -55,10 +43,8 @@ def geographic_alt(NewTable):
                             'ano_coleta','mes_coleta', 'genero_atual','ordem', 'familia', 'type_status'])
     ).project(type='naturalEarth1')
 
+
     temp = (world + teste).configure_title(fontSize=16).configure_axis(
-        labelFontSize=12,
-        titleFontSize=12
-    ).configure_legend(
         labelFontSize=12,
         titleFontSize=12
     )
@@ -74,6 +60,10 @@ def timeX_family_continentY(data):
     # database
     db = teste
 
+    db = db.dropna(subset=['ano_coleta'])
+    db['ano_coleta'] = db['ano_coleta'].astype(int)
+    db[['continente','familia']] = db[['continente','familia']].astype(str)
+
     # auxiliar variables for encoding fields
     x_labels = db.sort_values('ano_coleta')['ano_coleta'].unique()
     xmin = x_labels.min()
@@ -81,6 +71,8 @@ def timeX_family_continentY(data):
     y_labels = db['continente'].unique()
     counts = db['counts'].unique()
     counts = list(range(min(counts), max(counts), 100))
+
+    interval = alt.selection_interval()
 
     graph = alt.Chart(db, title='Temporal evolution per continent', height=300, width=1400).mark_circle().encode(
         x= alt.X('ano_coleta', title='Sampling Year', 
@@ -97,7 +89,9 @@ def timeX_family_continentY(data):
                         legend= None,
                         scale= alt.Scale(domain= list(cores_familia.keys()), range= list(cores_familia.values()))),
         tooltip= alt.Tooltip(['continente','ano_coleta','familia','counts'])
-    )
+    ).properties(
+            selection=interval
+        )
 
     graph = graph.configure_title(fontSize=16).configure_axis(
         labelFontSize=12,
