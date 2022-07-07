@@ -27,12 +27,12 @@ def timeX_collector_countTypeY(NewTable: pd.DataFrame):
     time_min = sort_list.min()
     time_max = sort_list.max()
 
-    graph = alt.Chart(db, height=900, width= 400, title='Types per Genus').mark_point(filled=False).encode(
+    graph = alt.Chart(db, height=900, width= 400, title='Registers Type by collector').mark_point(filled=False).encode(
         x = alt.X('ano_coleta:Q', title='Description Year',
                 scale= alt.Scale(domain=[time_min, time_max])),
-        y = alt.Y('collector_full_name:N', title= 'Genus', sort=alt.EncodingSortField('ano_coleta',op='min',order='ascending')),
+        y = alt.Y('collector_full_name:N', title= 'Collector name', sort=alt.EncodingSortField('ano_coleta',op='min',order='ascending')),
     #               sort=genus_order),
-        color= alt.Color('familia:N', title='Family',
+        color= alt.Color('familia:N',
                         legend=None,
                         scale= alt.Scale(domain= list(cores_familia.keys()), range=list(cores_familia.values()))), 
         size= alt.Size('counts', title='Counts',
@@ -67,10 +67,10 @@ def timeX_countTypeY(NewTable: pd.DataFrame):
     time_min = sort_list.min()
     time_max = sort_list.max()
 
-    graph = alt.Chart(db, height=900, width= 400, title='Types per Genus').mark_point(filled=False).encode(
-        x = alt.X('ano_coleta:Q', title='Description Year',
+    graph = alt.Chart(db, height=900, width= 400, title='Registers by Type').mark_point(filled=False).encode(
+        x = alt.X('ano_coleta:Q', title='Year Collected',
                 scale= alt.Scale(domain=[time_min, time_max])),
-        y = alt.Y('type_status:N', title= 'type', sort=alt.EncodingSortField('ano_coleta',op='min',order='ascending')),
+        y = alt.Y('type_status:N', title= 'Type', sort=alt.EncodingSortField('ano_coleta',op='min',order='ascending')),
     #               sort=genus_order), 
         size= alt.Size('counts', title='Counts',
                     legend= None,

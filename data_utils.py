@@ -10,3 +10,19 @@ def filter_data(data, families_filter_out, type_filter_out, time1, time2):
   filtered_data = filtered_data.where((~filtered_data['type_status'].isin(type_filter_out)))
 
   return filtered_data
+
+
+def create_map_data(data:pd.DataFrame):
+  renames = {
+    'long':'lon'
+  }
+
+  to_keep = [
+    'lon',
+    'lat',
+  ]
+
+  data =  data.rename(columns=renames)[to_keep][:3000]
+  data.dropna(subset=to_keep, inplace=True)
+
+  return data

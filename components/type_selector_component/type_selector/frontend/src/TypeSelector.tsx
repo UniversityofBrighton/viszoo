@@ -21,6 +21,17 @@ class TypeSelector extends StreamlitComponentBase {
 
     const type_disp = types.map((typ: { [x: string]: any }, index: number) => {
       var selectColor
+      var name_display
+
+      // name display
+      if (typ['name'] === 'nan') {
+        name_display = 'no type'
+      }
+      else{
+        name_display = typ["name"]
+      }
+
+      // color display
       if (typ["selected"] === true) {
         selectColor = 'black'
       }
@@ -62,7 +73,7 @@ class TypeSelector extends StreamlitComponentBase {
           onClick={() => this.onClicked(types, index)} >
         </div>
         <div style={{display:"inline-block", paddingLeft:10}}>
-          {typ["name"]}
+          {name_display}
         </div>
       </div>
       )

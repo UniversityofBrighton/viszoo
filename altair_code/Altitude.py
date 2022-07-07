@@ -40,16 +40,22 @@ def familyX_altitudeY(NewTable):
 
   #color_pal = alt.condition(alt.FieldOneOfPredicate("familia",new_fam), alt.Color('familia:N', title= 'Family', legend = None, scale=alt.Scale(domain= list(cores_familia.keys()), range= list(cores_familia.values()))), alt.value('lightgray'))
 
-  temp = alt.Chart(db, title='Altitude per family').mark_circle().encode(
+  temp = alt.Chart(db, title='Altitude per Family').mark_circle().encode(
       x = alt.X('familia', type='nominal', title='Family', 
-                sort= alt.EncodingSortField('altitude', op='max', order='ascending')),
+                sort= alt.EncodingSortField('altitude', op='mean', order='ascending')),
       y = alt.Y('altitude', type='quantitative', title='Altitude (in meters)'),
       color= alt.Color('familia:N', title= 'Family', 
                     legend = None,
                     scale=alt.Scale(domain= list(cores_familia.keys()), 
                                     range= list(cores_familia.values()))),
-      tooltip = alt.Tooltip(['numero_catalogo', 'genero_atual','especie_atual','subespecie_atual', 
-                              'qualificador_atual', 'ano_coleta','altitude'])
+      tooltip = [alt.Tooltip('numero_catalogo', title='number in catalogue'),
+              alt.Tooltip('genero_atual', title='Genus'),
+              alt.Tooltip('especie_atual', title='Species'),
+              alt.Tooltip('subespecie_atual', title='Subspecies'),
+              alt.Tooltip('qualificador_atual', title='qualifier'),
+              alt.Tooltip('ano_coleta', title='year collected'),
+              alt.Tooltip('altitude', title='altitude')],
+
   )
 
   return temp
@@ -68,10 +74,10 @@ def genusX_altitudeY(data):
   data = data[data['altitude'] < 7000].copy()
 
   # ordering x-axis per mean altitude - OUTLIER: ordem nula
-  graph = alt.Chart(data, title='Altitude per genus',
+  graph = alt.Chart(data, title='Altitude per Genus',
                   width= 900, height=300).mark_circle().encode(
       x = alt.X('genero_atual', type='nominal', title='Genus',
-              sort=alt.EncodingSortField('altitude', op="max", order="ascending")),
+              sort=alt.EncodingSortField('altitude', op="mean", order="ascending")),
       y = alt.Y('altitude:Q', title='Altitude (in meters)'),
       color = alt.Color('familia:N', title='Family',
                       legend=None,

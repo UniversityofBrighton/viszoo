@@ -74,7 +74,7 @@ def timeX_family_continentY(data):
 
     interval = alt.selection_interval()
 
-    graph = alt.Chart(db, title='Temporal evolution per continent', height=300, width=1400).mark_circle().encode(
+    graph = alt.Chart(db, title='Registers Family by Continent', height=300, width=1400).mark_circle().encode(
         x= alt.X('ano_coleta', title='Sampling Year', 
                 scale= alt.Scale(domain= [xmin,xmax])),
         y= alt.Y('continente:N', title='Continent', 
@@ -120,7 +120,7 @@ def timeX_family_countryY(data):
     counts = db['counts'].unique()
     counts = list(range(min(counts), max(counts), 100))
 
-    graph = alt.Chart(db, title='Temporal evolution per country', height=500, width=1400).mark_circle().encode(
+    graph = alt.Chart(db, title='Registers Family by Country', height=500, width=1400).mark_circle().encode(
         x= alt.X('ano_coleta', title='Sampling Year', 
                 scale= alt.Scale(domain= [xmin,xmax])),
         y= alt.Y('pais:N', title='country', 
@@ -164,7 +164,7 @@ def timeX_family_statesY(data):
     counts = db['counts'].unique()
     counts = list(range(min(counts), max(counts), 100))
 
-    graph = alt.Chart(db, title='Temporal evolution per brazilian states', height=1500, width=1400).mark_circle().encode(
+    graph = alt.Chart(db, title='Registers Family by Brazilian States', height=1500, width=1400).mark_circle().encode(
         x= alt.X('ano_coleta', title='Sampling Year', 
                 scale= alt.Scale(domain= [xmin,xmax])),
         y= alt.Y('estado_ou_provincia:N', title='states', 

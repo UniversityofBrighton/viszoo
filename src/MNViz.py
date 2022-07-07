@@ -54,17 +54,6 @@ def treat_taxon_columns(df, columns, inplace=True):
                 temp[col] = temp[col].apply(lambda x:str(x).lower().strip().capitalize())
                 
         return temp    
-
-    
-# trying to catch year from string "dd/mm/YYYY"
-# def catch_year(row):
-#     if not str(row).find('/')==-1:
-#         dates_values = str(row).split("/")
-#         year = int(dates_values[-1])
-#         month = int(dates_values[1])
-#         return year
-#     else:
-#         return np.NaN
     
     
 def str_with_nan2int(string):

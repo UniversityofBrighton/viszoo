@@ -24,7 +24,7 @@ def timeX_family_countY(NewTable):
     time_max = sort_list.max()
 
     graph = alt.Chart(teste,
-                width=500, height=500, title='Number of collected specimens of each family per year').mark_circle(
+                width=500, height=500, title='Registers by Families').mark_circle(
                                                                                     size=60).encode(
         x= alt.X('ano_coleta', title='Collected Year', scale=alt.Scale(domain=[time_min, time_max])),
         y= alt.Y('familia', type='nominal', title='Family {} {}'.format(time_min, time_max),
@@ -70,7 +70,7 @@ def timeX_family_countTypeY(NewTable: pd.DataFrame):
     #color_pal = alt.condition(alt.FieldOneOfPredicate("familia",new_fam), alt.Color('familia:O', title= 'Family',
     #                    legend= None, scale= alt.Scale(domain= list(cores_familia.keys()), range=list(cores_familia.values())))#, alt.value('lightgray'))
 
-    graph = alt.Chart(teste, height=500, width=250, title='Types per Family').mark_point(filled=False).encode(
+    graph = alt.Chart(teste, height=500, width=250, title='Registers Type by Family').mark_point(filled=False).encode(
     x = alt.X('ano_coleta:Q', title='Description Year', 
               scale= alt.Scale(domain=[time_min, time_max])),
     y = alt.Y('familia:N', title= 'Family', sort= alt.EncodingSortField('ano_coleta', op='min', order='ascending')),
@@ -113,7 +113,7 @@ def timeX_genus_countTypeY(NewTable: pd.DataFrame):
     time_min = sort_list.min()
     time_max = sort_list.max()
 
-    graph = alt.Chart(db, height=500, width= 400, title='Types per Genus').mark_point(filled=False).encode(
+    graph = alt.Chart(db, height=500, width= 400, title='Registers Type by Genus').mark_point(filled=False).encode(
         x = alt.X('ano_coleta:Q', title='Description Year',
                 scale= alt.Scale(domain=[time_min, time_max])),
         y = alt.Y('genero_atual:N', title= 'Genus', sort=alt.EncodingSortField('ano_coleta',op='min',order='ascending')),
@@ -160,10 +160,10 @@ def timeX_order_countY(NewTable):
     time_max = sort_list.max()
 
     graph = alt.Chart(teste,
-                width=500, height=500, title='Number of collected specimens of each family per year').mark_circle(
+                width=500, height=500, title='Registers by Order').mark_circle(
                                                                                     size=60).encode(
         x= alt.X('ano_coleta', title='Collected Year', scale=alt.Scale(domain=[time_min, time_max])),
-        y= alt.Y('ordem', type='nominal', title='Family',
+        y= alt.Y('ordem', type='nominal', title='Order',
                 sort= alt.EncodingSortField(field='ano_coleta', op='min', order='ascending')),
         size= alt.Size('counts', title='Counts',
                     legend= None, scale=alt.Scale(range=[15,100])),
