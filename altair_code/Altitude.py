@@ -1,26 +1,31 @@
-import datetime
+
 import numpy as np
 import pandas as pd
+import streamlit as st
 
 from collections import defaultdict
 
 import altair as alt
 
-
+from data_utils import *
 from src.MNViz_colors import *
+
 
 from itertools import compress
 
 def familyX_altitudeY(NewTable):
 
+  cores_familia = get_colors(st.session_state["app_version"])
   alt.data_transformers.disable_max_rows()
 
   # subsetting
-  teste = NewTable[['altitude','familia','ordem','subordem', 'ano_coleta', 'qualificador_atual', 'numero_catalogo', 
-                    'genero_atual', 'especie_atual', 'subespecie_atual']].copy()
+  teste = NewTable[['altitude','family','order','suborder', 'year_collected', 'qualifier', 'catalog_number', 
+                    'genus', 'species', 
+                    #'subspecies'
+                    ]].copy()
 
   # sorting
-  teste = teste.sort_values(['altitude','familia'])
+  teste = teste.sort_values(['altitude','family'])
 
   # dropping na
   teste.dropna(subset=['altitude'], inplace=True)
@@ -32,28 +37,28 @@ def familyX_altitudeY(NewTable):
   teste = teste[teste['altitude'] < 7000].copy()
 
   # database
-  db = teste[teste['familia'] != "#n/d"]
+  db = teste[teste['family'] != "#n/d"]
 
   # aux. variables
   ordens = list(cores_ordem.keys())
   cores = list(cores_ordem.values())
 
-  #color_pal = alt.condition(alt.FieldOneOfPredicate("familia",new_fam), alt.Color('familia:N', title= 'Family', legend = None, scale=alt.Scale(domain= list(cores_familia.keys()), range= list(cores_familia.values()))), alt.value('lightgray'))
+  #color_pal = alt.condition(alt.FieldOneOfPredicate("familia",new_fam), alt.Color('family:N', title= 'Family', legend = None, scale=alt.Scale(domain= list(cores_familia.keys()), range= list(cores_familia.values()))), alt.value('lightgray'))
 
   temp = alt.Chart(db, title='Altitude per Family').mark_circle().encode(
-      x = alt.X('familia', type='nominal', title='Family', 
+      x = alt.X('family', type='nominal', title='Family', 
                 sort= alt.EncodingSortField('altitude', op='mean', order='ascending')),
       y = alt.Y('altitude', type='quantitative', title='Altitude (in meters)'),
-      color= alt.Color('familia:N', title= 'Family', 
+      color= alt.Color('family:N', title= 'Family', 
                     legend = None,
                     scale=alt.Scale(domain= list(cores_familia.keys()), 
                                     range= list(cores_familia.values()))),
-      tooltip = [alt.Tooltip('numero_catalogo', title='number in catalogue'),
-              alt.Tooltip('genero_atual', title='Genus'),
-              alt.Tooltip('especie_atual', title='Species'),
-              alt.Tooltip('subespecie_atual', title='Subspecies'),
-              alt.Tooltip('qualificador_atual', title='qualifier'),
-              alt.Tooltip('ano_coleta', title='year collected'),
+      tooltip = [alt.Tooltip('catalog_number', title='number in catalogue'),
+              alt.Tooltip('genus', title='Genus'),
+              alt.Tooltip('species', title='Species'),
+              #alt.Tooltip('subspecies', title='Subspecies'),
+              alt.Tooltip('qualifier', title='qualifier'),
+              alt.Tooltip('year_collected', title='year collected'),
               alt.Tooltip('altitude', title='altitude')],
 
   )
@@ -63,8 +68,11 @@ def familyX_altitudeY(NewTable):
 
 def genusX_altitudeY(data):
 
-  data = data[['altitude','especie_atual','genero_atual','ordem', 'subordem',
-                 'familia', 'ano_coleta', 'qualificador_atual', 'numero_catalogo', 'subespecie_atual']]
+  cores_familia = get_colors(st.session_state["app_version"])
+  data = data[['altitude','species','genus','order', 'suborder',
+                 'family', 'year_collected', 'qualifier', 'catalog_number', 
+                 #'subspecies'
+                  ]]
 
   # dropping na
   data = data.dropna(subset=['altitude'])
@@ -76,15 +84,16 @@ def genusX_altitudeY(data):
   # ordering x-axis per mean altitude - OUTLIER: ordem nula
   graph = alt.Chart(data, title='Altitude per Genus',
                   width= 900, height=300).mark_circle().encode(
-      x = alt.X('genero_atual', type='nominal', title='Genus',
+      x = alt.X('genus', type='nominal', title='Genus',
               sort=alt.EncodingSortField('altitude', op="mean", order="ascending")),
       y = alt.Y('altitude:Q', title='Altitude (in meters)'),
-      color = alt.Color('familia:N', title='Family',
+      color = alt.Color('family:N', title='Family',
                       legend=None,
                       scale= alt.Scale(domain=list(cores_familia.keys()), range= list(cores_familia.values()))),
-      tooltip = alt.Tooltip(['numero_catalogo', 'genero_atual','especie_atual','subespecie_atual', 
-                          'ordem', 'subordem',
-                              'qualificador_atual', 'ano_coleta','altitude'])
+      tooltip = alt.Tooltip(['catalog_number', 'genus','species',
+                          #'subspecies', 
+                          'order', 'suborder',
+                              'qualifier', 'year_collected','altitude'])
   )
 
   graph = graph.configure_title(fontSize=16).configure_axis(
@@ -99,3 +108,46 @@ def genusX_altitudeY(data):
   # g
   return graph
 
+def familyX_depthY(data):
+
+  cores_familia = get_colors(st.session_state["app_version"])
+  # subsetting
+  teste = data[['min_depth','family','infraorder', 'year_collected', 'qualifier', 'catalog_number', 
+                    'genus', 'species', 'collector_full_name', 'country','state','locality', 'type_status']].copy()
+
+  # sorting
+  teste = teste.sort_values(['min_depth','family'])
+
+  # dropping na
+  teste.dropna(subset=['min_depth'], inplace=True)
+
+  # making sure altitude is a floating point number
+  teste['min_depth'] = teste['min_depth'].astype(float)
+
+  # extremes for scale
+  max_y = teste['min_depth'].max()
+  min_y = teste['min_depth'].min()
+
+  temp = alt.Chart(teste, title='Depth per Family', width=800, height=400).mark_circle().encode(
+    x = alt.X('family', type='nominal', title='Family', 
+              sort= alt.EncodingSortField('min_depth', op='max', order='ascending')),
+    y = alt.Y('min_depth', type='quantitative', title='Depth (in meters)',
+              scale = alt.Scale(domain=[max_y, min_y])),
+        color= alt.Color('family:N', title='Family', 
+                     scale=alt.Scale(domain=list(cores_familia.keys()), 
+                                     range=list(cores_familia.values())),
+                      legend=None),
+    tooltip = alt.Tooltip(['catalog_number', 'infraorder','family','genus','species', 'type_status',
+                            'qualifier', 'year_collected','collector_full_name',
+                            'country', 'state', 'locality', 'min_depth'])
+  )
+
+  temp = temp.configure_title(fontSize=16).configure_axis(
+      labelFontSize=12,
+      titleFontSize=12
+  ).configure_legend(
+      labelFontSize=12,
+      titleFontSize=12
+  )
+
+  return temp

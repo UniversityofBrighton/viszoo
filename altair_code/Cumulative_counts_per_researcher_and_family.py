@@ -205,30 +205,30 @@ collectors = [name for name in collectors if 'nan' not in str(name)]  # removing
 
 
 # subsetting (p.s.: kingdom is a non-empty column used only for counting)
-df = NewTable[[collector_columns[0], 'ano_coleta', 'kingdom']].copy()
+df = NewTable[[collector_columns[0], 'year_collected', 'kingdom']].copy()
 
 # concatenating all columns into just one to make grouping per determiner and year easier
 if len(collector_columns) > 1:
     for col in collector_columns[1:]:
-        temp = NewTable[[col, 'ano_coleta', 'kingdom']].copy()
-        temp.columns = [collector_columns[0], 'ano_coleta', 'kingdom']
+        temp = NewTable[[col, 'year_collected', 'kingdom']].copy()
+        temp.columns = [collector_columns[0], 'year_collected', 'kingdom']
         
         df = pd.concat([df, temp])
         
 # parsing columns into strings so we don't lose information while grouping
 df[collector_columns[0]] = df[collector_columns[0]].astype(str)
-df['ano_coleta'] = df['ano_coleta'].astype(str)
+df['year_collected'] = df['year_collected'].astype(str)
 
 
 # In[11]:
 
 
 # grouping
-grouped = df.groupby([collector_columns[0], 'ano_coleta']).count().reset_index().rename(columns=
+grouped = df.groupby([collector_columns[0], 'year_collected']).count().reset_index().rename(columns=
                                                         {'kingdom':'count'})
 
 # sorting
-grouped.sort_values('ano_coleta', inplace=True)
+grouped.sort_values('year_collected', inplace=True)
 
 # cumulatively counting for each determiner
 counts = pd.DataFrame()
@@ -245,7 +245,7 @@ for col in collectors:
 
 
 # temporary adjustment for axis labels only
-counts['ano_coleta'] = counts['ano_coleta'].apply(lambda x:str(x).split('.')[0])
+counts['year_collected'] = counts['year_collected'].apply(lambda x:str(x).split('.')[0])
 
 
 # In[13]:
@@ -255,7 +255,7 @@ select = alt.selection(type='single', on='mouseover', nearest=True, fields=['col
 
 base = alt.Chart(counts, title='Cumulative contribution of each Collector', width=800,
               height=500).encode(
-    x= alt.X('ano_coleta', type="ordinal", title='Sampling Year'),
+    x= alt.X('year_collected', type="ordinal", title='Sampling Year'),
     y= alt.Y('cumulative_sum', title='', 
              sort=alt.EncodingSortField('counts', op="count", order='descending')),
     color= alt.Color('collector_full_name:N', title='', legend=None, 
@@ -264,7 +264,7 @@ base = alt.Chart(counts, title='Cumulative contribution of each Collector', widt
 
 points = base.mark_circle(size=40).encode(
     opacity=alt.value(0.5),
-    tooltip= alt.Tooltip(['collector_full_name','ano_coleta','count', 'cumulative_sum'])
+    tooltip= alt.Tooltip(['collector_full_name','year_collected','count', 'cumulative_sum'])
 ).add_selection(
     select
 )
@@ -297,12 +297,12 @@ g1 = g1.configure_title(fontSize=16).configure_axis(
 
 
 # grouping per Year and Family
-teste = NewTable.groupby(['ano_coleta','familia']).count()['class'].reset_index().rename(columns={
+teste = NewTable.groupby(['year_collected','family']).count()['class'].reset_index().rename(columns={
     'class':'counts'
 })
 
 # sorting...
-teste = teste.sort_values(['familia', 'ano_coleta'])
+teste = teste.sort_values(['family', 'year_collected'])
 
 
 # In[23]:
@@ -310,8 +310,8 @@ teste = teste.sort_values(['familia', 'ano_coleta'])
 
 # cumulatively counting
 cumSum = []
-for family in teste['familia'].unique():
-    cumSum.extend(list(teste[teste['familia'] == family]['counts'].cumsum()))
+for family in teste['family'].unique():
+    cumSum.extend(list(teste[teste['family'] == family]['counts'].cumsum()))
     
 teste['cumulative_sum'] = cumSum
 
@@ -322,29 +322,29 @@ teste['cumulative_sum'] = cumSum
 
 
 # filtering out some families lost while grouping
-# familias = [f for f in cores_familia.keys() if f in teste['familia'].unique()]
+# familias = [f for f in cores_familia.keys() if f in teste['family'].unique()]
 # cores_temp = [cores_familia[f] for f in familias] 
 
 # selector
-select_family = alt.selection_multi(fields=['familia'], bind='legend')
+select_family = alt.selection_multi(fields=['family'], bind='legend')
 
 # aux. variables for encoding fields
-x_labels = teste.sort_values('ano_coleta')['ano_coleta'].unique()
+x_labels = teste.sort_values('year_collected')['year_collected'].unique()
 # x_labels = [str(y).split('.')[0] for y in x_labels]
 y_max = np.ceil(max(teste['cumulative_sum'].unique()))
 
 g1 = alt.Chart(teste, title='Cumulative amount of specimens per family', 
                width=600, height=400).mark_line(point=True).encode(
-    x= alt.X('ano_coleta', type="ordinal", title='Sampling Year',
+    x= alt.X('year_collected', type="ordinal", title='Sampling Year',
              scale= alt.Scale(domain= x_labels)),
     y= alt.Y('cumulative_sum', title='', 
              scale= alt.Scale(domain=[0, y_max]),
              sort=alt.EncodingSortField('counts', op="count", order='descending')),
-    color= alt.Color('familia:N', title='Family',
+    color= alt.Color('family:N', title='Family',
                      legend= alt.Legend(columns=2, symbolLimit=50),
                      scale=alt.Scale(domain=list(cores_familia.keys()), 
                                      range= list(cores_familia.values()))),
-    tooltip= alt.Tooltip(['familia','ano_coleta','counts', 'cumulative_sum']),
+    tooltip= alt.Tooltip(['family','year_collected','counts', 'cumulative_sum']),
     opacity= alt.condition(select_family, alt.value(1), alt.value(0))
 ).add_selection(select_family).transform_filter(select_family)
 
@@ -368,12 +368,12 @@ g1 = g1.configure_title(fontSize=16).configure_axis(
 
 
 # grouping per Year and Family
-teste = NewTable.groupby(['ano_determinacao','familia']).count()['class'].reset_index().rename(columns={
+teste = NewTable.groupby(['ano_determinacao','family']).count()['class'].reset_index().rename(columns={
     'class':'counts'
 })
 
 # sorting...
-teste = teste.sort_values(['familia', 'ano_determinacao'])
+teste = teste.sort_values(['family', 'ano_determinacao'])
 
 
 # In[18]:
@@ -381,8 +381,8 @@ teste = teste.sort_values(['familia', 'ano_determinacao'])
 
 # cumulatively counting
 cumSum = []
-for family in teste['familia'].unique():
-    cumSum.extend(list(teste[teste['familia'] == family]['counts'].cumsum()))
+for family in teste['family'].unique():
+    cumSum.extend(list(teste[teste['family'] == family]['counts'].cumsum()))
     
 teste['cumulative_sum'] = cumSum
 
@@ -391,11 +391,11 @@ teste['cumulative_sum'] = cumSum
 
 
 # filtering out some families lost while grouping
-# familias = [f for f in cores_familia.keys() if f in teste['familia'].unique()]
+# familias = [f for f in cores_familia.keys() if f in teste['family'].unique()]
 # cores_temp = [cores_familia[f] for f in familias] 
 
 # selector
-select_family = alt.selection_multi(fields=['familia'], bind='legend')
+select_family = alt.selection_multi(fields=['family'], bind='legend')
 
 # aux. variables for encoding fields
 x_labels = teste.sort_values('ano_determinacao')['ano_determinacao'].unique()
@@ -410,11 +410,11 @@ g1 = alt.Chart(teste, title='Cumulative amount of specimens per family',
     y= alt.Y('cumulative_sum', title='', 
              scale= alt.Scale(domain= [0, y_max]),
              sort=alt.EncodingSortField('counts', op="count", order='descending')),
-    color= alt.Color('familia:N', title='Família',
+    color= alt.Color('family:N', title='Família',
                      legend= alt.Legend(columns=2, symbolLimit=50),
                      scale=alt.Scale(domain=list(cores_familia.keys()), 
                                      range= list(cores_familia.values()))),
-    tooltip= alt.Tooltip(['familia','ano_determinacao','counts', 'cumulative_sum']),
+    tooltip= alt.Tooltip(['family','ano_determinacao','counts', 'cumulative_sum']),
     opacity= alt.condition(select_family, alt.value(1), alt.value(0))
 ).add_selection(select_family).transform_filter(select_family)
 

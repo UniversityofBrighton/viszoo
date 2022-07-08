@@ -11,6 +11,9 @@ import pandas as pd
 
 # pacote para visualização principal
 import altair as alt
+import streamlit as st
+from data_utils import *
+
 from src.MNViz_colors import *
 
 # habilitando renderizador para notebook
@@ -20,19 +23,20 @@ from src.MNViz_colors import *
 
 def timeX_collector_countTypeY(NewTable: pd.DataFrame):
 
+    cores_familia = get_colors(st.session_state["app_version"])
         # database
-    db = NewTable.groupby(['ano_coleta', 'collector_full_name', 'type_status', 'familia']).count()['class'].reset_index().rename(columns={'class':'counts'})
+    db = NewTable.groupby(['year_collected', 'collector_full_name', 'type_status', 'family']).count()['class'].reset_index().rename(columns={'class':'counts'})
 
-    sort_list = db.sort_values('ano_coleta')['ano_coleta'].unique()
+    sort_list = db.sort_values('year_collected')['year_collected'].unique()
     time_min = sort_list.min()
     time_max = sort_list.max()
 
     graph = alt.Chart(db, height=900, width= 400, title='Registers Type by collector').mark_point(filled=False).encode(
-        x = alt.X('ano_coleta:Q', title='Description Year',
+        x = alt.X('year_collected:Q', title='Description Year',
                 scale= alt.Scale(domain=[time_min, time_max])),
-        y = alt.Y('collector_full_name:N', title= 'Collector name', sort=alt.EncodingSortField('ano_coleta',op='min',order='ascending')),
+        y = alt.Y('collector_full_name:N', title= 'Collector name', sort=alt.EncodingSortField('year_collected',op='min',order='ascending')),
     #               sort=genus_order),
-        color= alt.Color('familia:N',
+        color= alt.Color('family:N',
                         legend=None,
                         scale= alt.Scale(domain= list(cores_familia.keys()), range=list(cores_familia.values()))), 
         size= alt.Size('counts', title='Counts',
@@ -41,9 +45,9 @@ def timeX_collector_countTypeY(NewTable: pd.DataFrame):
         order= alt.Order('counts', sort='descending'),  # smaller points in front
         shape= alt.Shape('type_status:N', title='Type',
                         legend=None), 
-        tooltip= [alt.Tooltip('familia', title='family'),
+        tooltip= [alt.Tooltip('family', title='family'),
                 alt.Tooltip('type_status', title='type'),
-                alt.Tooltip('ano_coleta', title='description year'),
+                alt.Tooltip('year_collected', title='description year'),
                 alt.Tooltip('counts', title='counts'),
                 alt.Tooltip('collector_full_name', title='collector')]
     )
@@ -60,17 +64,18 @@ def timeX_collector_countTypeY(NewTable: pd.DataFrame):
 
 def timeX_countTypeY(NewTable: pd.DataFrame):
 
+    cores_familia = get_colors(st.session_state["app_version"])
         # database
-    db = NewTable.groupby(['ano_coleta', 'type_status']).count()['class'].reset_index().rename(columns={'class':'counts'})
+    db = NewTable.groupby(['year_collected', 'type_status']).count()['class'].reset_index().rename(columns={'class':'counts'})
 
-    sort_list = db.sort_values('ano_coleta')['ano_coleta'].unique()
+    sort_list = db.sort_values('year_collected')['year_collected'].unique()
     time_min = sort_list.min()
     time_max = sort_list.max()
 
     graph = alt.Chart(db, height=900, width= 400, title='Registers by Type').mark_point(filled=False).encode(
-        x = alt.X('ano_coleta:Q', title='Year Collected',
+        x = alt.X('year_collected:Q', title='Year Collected',
                 scale= alt.Scale(domain=[time_min, time_max])),
-        y = alt.Y('type_status:N', title= 'Type', sort=alt.EncodingSortField('ano_coleta',op='min',order='ascending')),
+        y = alt.Y('type_status:N', title= 'Type', sort=alt.EncodingSortField('year_collected',op='min',order='ascending')),
     #               sort=genus_order), 
         size= alt.Size('counts', title='Counts',
                     legend= None,
@@ -79,7 +84,7 @@ def timeX_countTypeY(NewTable: pd.DataFrame):
         shape= alt.Shape('type_status:N', title='Type',
                         legend=None), 
         tooltip= [alt.Tooltip('type_status', title='type'),
-                alt.Tooltip('ano_coleta', title='description year'),
+                alt.Tooltip('year_collected', title='description year'),
                 alt.Tooltip('counts', title='counts')]
     )
 

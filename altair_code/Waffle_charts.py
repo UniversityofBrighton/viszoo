@@ -276,8 +276,8 @@ def calcPercentages(df, col='order', discard_col= 'index'):
 # In[8]:
 
 
-percent = calcPercentages(NewTable, col='ordem')
-percent = percent[percent['ordem'].isin(ordens)].copy()
+percent = calcPercentages(NewTable, col='order')
+percent = percent[percent['order'].isin(ordens)].copy()
 
 percent
 
@@ -286,7 +286,7 @@ percent
 
 
 # adicionando coluna com as cores por ordem
-percent['cores'] = percent['ordem'].apply(lambda x: cores_ordem[x])
+percent['cores'] = percent['order'].apply(lambda x: cores_ordem[x])
 
 
 # In[10]:
@@ -313,7 +313,7 @@ fig1 = plt.figure(
             'fontsize':20
         }
     },
-    labels=["{0} ({1}%)".format(k, round(v, 2)) for k, v in zip(percent['ordem'], percent['percent'])],
+    labels=["{0} ({1}%)".format(k, round(v, 2)) for k, v in zip(percent['order'], percent['percent'])],
     legend={'loc': 'upper left', 'bbox_to_anchor': (1, 1), 'fontsize':12},
     icon_size=18,
     vertical= True,
@@ -348,7 +348,7 @@ def identificaGrupo(grupos, familia):
 # In[13]:
 
 
-NewTable['grupo'] = NewTable['familia'].apply(lambda x: identificaGrupo(grupos, x))
+NewTable['grupo'] = NewTable['family'].apply(lambda x: identificaGrupo(grupos, x))
 
 
 # In[14]:
@@ -420,10 +420,10 @@ NewTable['grupo'].value_counts()
 temp = NewTable[NewTable['grupo'] == 'grupo 7'].copy()
 
 # 2. calcular percentagens
-percent = calcPercentages(temp, col='familia')
+percent = calcPercentages(temp, col='family')
 
 # 3. identificar cores
-percent['cores'] = percent['familia'].apply(lambda x: cores_familia[x])
+percent['cores'] = percent['family'].apply(lambda x: cores_familia[x])
 
 # ordenando percentuais
 # percent.sort_values('percent', inplace=True)
@@ -447,7 +447,7 @@ fig1 = plt.figure(
             'fontsize':20
         }
     },
-    labels=["{0} ({1}%)".format(k, round(v, 2)) for k, v in zip(percent['familia'], percent['percent'])],
+    labels=["{0} ({1}%)".format(k, round(v, 2)) for k, v in zip(percent['family'], percent['percent'])],
     legend={'loc': 'upper left', 'bbox_to_anchor': (1, 1), 'fontsize':12},
     icon_size=18,
     vertical= True,
@@ -471,10 +471,10 @@ for i in range(len(grupos)-2):
     temp = NewTable[NewTable['grupo'] == f'grupo {i+1}'].copy()
 
     # 2. calcular percentagens
-    percent = calcPercentages(temp, col='familia')
+    percent = calcPercentages(temp, col='family')
 
     # 3. identificar cores
-    percent['cores'] = percent['familia'].apply(lambda x: cores_familia[x])
+    percent['cores'] = percent['family'].apply(lambda x: cores_familia[x])
 
     # ordenando percentuais
 #     percent.sort_values('percent', inplace=True)
@@ -498,7 +498,7 @@ for i in range(len(grupos)-2):
                 'fontsize':20
             }
         },
-        labels=["{0} ({1}%)".format(k, round(v, 2)) for k, v in zip(percent['familia'], percent['percent'])],
+        labels=["{0} ({1}%)".format(k, round(v, 2)) for k, v in zip(percent['family'], percent['percent'])],
         legend={'loc': 'upper left', 'bbox_to_anchor': (1, 1), 'fontsize':12},
         icon_size=18,
         vertical= True,
@@ -522,20 +522,20 @@ for i in range(len(grupos)-2):
 # In[20]:
 
 
-family_counts = NewTable['familia'].value_counts().reset_index()
-family_counts.columns = ['familia', 'count']
+family_counts = NewTable['family'].value_counts().reset_index()
+family_counts.columns = ['family', 'count']
 
 
 # In[21]:
 
 
-NewTable.sort_values('ordem', inplace=True)
+NewTable.sort_values('order', inplace=True)
 
 
 # In[22]:
 
 
-NewTable[NewTable['familia'] == '#n/d']['ordem']
+NewTable[NewTable['family'] == '#n/d']['order']
 
 
 # In[23]:
@@ -544,21 +544,21 @@ NewTable[NewTable['familia'] == '#n/d']['ordem']
 d = defaultdict()
 
 index=0
-for family in NewTable['familia'].unique():
+for family in NewTable['family'].unique():
     
     # comentar na reunião (ordem Caudata e Serpentes)
     if family == 'Nan' or family == '#n/d' or family == 'Plethodontidae':
         continue
     # filtrando a base e calculando percentuais
-    temp = calcPercentages(NewTable[NewTable['familia']==family], col='ordem')
+    temp = calcPercentages(NewTable[NewTable['family']==family], col='order')
     temp.sort_values('percent', inplace=True)
-    temp = temp[temp['ordem'].isin(ordens)]
+    temp = temp[temp['order'].isin(ordens)]
     
     # criando coluna de cores
-    temp['cores'] = temp['ordem'].apply(lambda x:cores_ordem[x])
+    temp['cores'] = temp['order'].apply(lambda x:cores_ordem[x])
     
     # contagem
-    count = family_counts[family_counts['familia'] == family]['count'].values[0] 
+    count = family_counts[family_counts['family'] == family]['count'].values[0] 
        
     index +=1
     

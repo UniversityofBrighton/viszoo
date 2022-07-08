@@ -31,7 +31,7 @@ def treat_names(name, pos='first'):
     
 
 # function to treat taxonomy columns
-def treat_taxon_columns(df, columns, inplace=True):
+def treat_taxon_columns(df:pd.DataFrame, columns, inplace=True):
     temp = df[columns].copy()
     
     if inplace:

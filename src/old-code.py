@@ -27,15 +27,15 @@ for row in Table['DataColetaInicial']:
         year = np.NAN
         month = np.NAN
         
-    d.append({'ano_coleta':year,
-              'mes_coleta':month,
-              'numero_catalogo':Table.loc[counter,'NumeroDeCatalogo'],
+    d.append({'year_collected':year,
+              'month_collected':month,
+              'catalog_number':Table.loc[counter,'NumeroDeCatalogo'],
               'class':Table.loc[counter,'Class'],
-              'kingdom':Table.loc[counter,'Kingdom'], 'genero_ent':Table.loc[counter,'Genero_ent'],
-              'genero_atual':Table.loc[counter,'Genero_atual'],
-              'especie_ent':Table.loc[counter,'Especie_ent'],
-              'especie_atual':Table.loc[counter,'Especie_atual'],
-              'subespecie_atual':Table.loc[counter, 'Subespecie_atual'],
+              'kingdom':Table.loc[counter,'Kingdom'], 'genus_old':Table.loc[counter,'Genero_ent'],
+              'genus':Table.loc[counter,'Genero_atual'],
+              'species_old':Table.loc[counter,'Especie_ent'],
+              'species':Table.loc[counter,'Especie_atual'],
+              'subspecies':Table.loc[counter, 'Subespecie_atual'],
               'genero_e_especie_ent': Table.loc[counter,'genero_e_especie_ent'],
               'genero_e_especie_atual': Table.loc[counter,'genero_e_especie_atual'],
               'type_status':Table.loc[counter,'Type Status 1'], 
@@ -43,11 +43,11 @@ for row in Table['DataColetaInicial']:
               'determinator_last_name':Table.loc[counter,'DeterminatorLastName1'],
               'altitude':Table.loc[counter,'MinAltitude'],
               'max_altitude':Table.loc[counter,'MaxAltitude'],
-              'ordem':Table.loc[counter,'Ordem'],
-              'familia':Table.loc[counter,'Familia'],
+              'order':Table.loc[counter,'Ordem'],
+              'family':Table.loc[counter,'Familia'],
               'phylum': Table.loc[counter,'Phylum'],
               'tipo': Table.loc[counter,'NotasTaxonomicas'],
-              'qualificador_atual': Table.loc[counter,'Qualificador_atual']
+              'qualifier': Table.loc[counter,'Qualificador_atual']
               })
     counter = counter+1
 
@@ -79,7 +79,7 @@ for row in Table['DataDaDeterminacao']:
 
     
 ### collecting start year (p.s.: being careful to keep NaNs as they show up)  
-NewTable['ano_entrada'] = np.nan
+NewTable['year_cataloged'] = np.nan
 d1 = []
 counter=0
 for row in Table['DataDeEntrada']:
@@ -96,7 +96,7 @@ for row in Table['DataDeEntrada']:
                 #store the year and month in a datetime datatype for later sorting
 #                dateRecord = datetime.datetime(year,month,1)    
 
-    NewTable.loc[counter, 'ano_entrada'] = year
+    NewTable.loc[counter, 'year_cataloged'] = year
     counter = counter+1
 
 # NewTable['determined_year'] = pd.Series(year, index=NewTable.index)

@@ -3,16 +3,16 @@ import pandas as pd
 
 # visualization
 import altair as alt
-
+from data_utils import *
+import streamlit as st
 # importing customized color palettes
 from src.MNViz_colors import *
 
-import streamlit as st
-
 def geographic_alt(NewTable: pd.DataFrame):
 
+    cores_familia = get_colors(st.session_state["app_version"])
     # corrects a typo (Améica do Sul)
-    NewTable['continente'] = NewTable['continente'].apply(lambda x: 'América do Sul' if x=='Améica do Sul' else x)
+    NewTable['continent'] = NewTable['continent'].apply(lambda x: 'América do Sul' if x=='Améica do Sul' else x)
 
 
     from vega_datasets import data
@@ -26,7 +26,7 @@ def geographic_alt(NewTable: pd.DataFrame):
 
     tipos = NewTable['type_status'].astype(str).unique()
 
-    #color_pal = alt.condition(alt.FieldOneOfPredicate("familia",new_fam),alt.Color('familia:N', title='Family', 
+    #color_pal = alt.condition(alt.FieldOneOfPredicate("familia",new_fam),alt.Color('family:N', title='Family', 
     #                    legend=None, 
     #                    scale= alt.Scale(domain= list(cores_familia.keys()), range= list(cores_familia.values()))),
     #                    alt.value('lightgray'))
@@ -34,13 +34,15 @@ def geographic_alt(NewTable: pd.DataFrame):
     teste = alt.Chart(NewTable).mark_point(filled=True).encode(
         longitude = alt.X('long:Q', title='Longitude'),
         latitude = alt.Y('lat:Q', title='Latitude'),
-        color= alt.Color('familia:N', title='Family', 
+        color= alt.Color('family:N', title='Family', 
                         legend=None, 
                         scale= alt.Scale(domain= list(cores_familia.keys()), range= list(cores_familia.values()))),
         shape = alt.Shape('type_status:N', title='Type', scale= alt.Scale(domain=tipos), 
                         legend=None),
-        tooltip = alt.Tooltip(['lat','long','pais','regiao','estado_ou_provincia',
-                            'ano_coleta','mes_coleta', 'genero_atual','ordem', 'familia', 'type_status'])
+        tooltip = alt.Tooltip(['lat','long','country','region','state',
+                            'year_collected',
+                            'month_collected',
+                            'genus','order', 'family', 'type_status'])
     ).project(type='naturalEarth1')
 
 
@@ -53,42 +55,43 @@ def geographic_alt(NewTable: pd.DataFrame):
 
 def timeX_family_continentY(data):
 
-    teste = data.groupby(['ano_coleta','continente', 'familia']).count()['class'].reset_index().rename(columns={
+    cores_familia = get_colors(st.session_state["app_version"])
+    teste = data.groupby(['year_collected','continent', 'family']).count()['class'].reset_index().rename(columns={
     'class':'counts'
     })
 
     # database
     db = teste
 
-    db = db.dropna(subset=['ano_coleta'])
-    db['ano_coleta'] = db['ano_coleta'].astype(int)
-    db[['continente','familia']] = db[['continente','familia']].astype(str)
+    db = db.dropna(subset=['year_collected'])
+    db['year_collected'] = db['year_collected'].astype(int)
+    db[['continent','family']] = db[['continent','family']].astype(str)
 
     # auxiliar variables for encoding fields
-    x_labels = db.sort_values('ano_coleta')['ano_coleta'].unique()
+    x_labels = db.sort_values('year_collected')['year_collected'].unique()
     xmin = x_labels.min()
     xmax = x_labels.max()
-    y_labels = db['continente'].unique()
+    y_labels = db['continent'].unique()
     counts = db['counts'].unique()
     counts = list(range(min(counts), max(counts), 100))
 
     interval = alt.selection_interval()
 
     graph = alt.Chart(db, title='Registers Family by Continent', height=300, width=1400).mark_circle().encode(
-        x= alt.X('ano_coleta', title='Sampling Year', 
+        x= alt.X('year_collected', title='Sampling Year', 
                 scale= alt.Scale(domain= [xmin,xmax])),
-        y= alt.Y('continente:N', title='Continent', 
+        y= alt.Y('continent:N', title='Continent', 
                 scale= alt.Scale(domain= y_labels),
                 sort=alt.EncodingSortField('counts', op="count", order='descending')), 
         size=alt.Size('counts', title='Counts',
                     legend= None,
                     scale= alt.Scale(domain= counts, range=[20,120])), 
         order= alt.Order('counts', sort='descending'),  # smaller points in front
-    #     color= alt.Color('ordem', scale=alt.Scale(domain=ordens, range=cores)),  # old palette per order
-        color= alt.Color('familia',title= 'Family', 
+    #     color= alt.Color('order', scale=alt.Scale(domain=ordens, range=cores)),  # old palette per order
+        color= alt.Color('family',title= 'Family', 
                         legend= None,
                         scale= alt.Scale(domain= list(cores_familia.keys()), range= list(cores_familia.values()))),
-        tooltip= alt.Tooltip(['continente','ano_coleta','familia','counts'])
+        tooltip= alt.Tooltip(['continent','year_collected','family','counts'])
     ).properties(
             selection=interval
         )
@@ -105,7 +108,8 @@ def timeX_family_continentY(data):
 
 def timeX_family_countryY(data):
 
-    teste = data.groupby(['ano_coleta','pais', 'familia']).count()['class'].reset_index().rename(columns={
+    cores_familia = get_colors(st.session_state["app_version"])
+    teste = data.groupby(['year_collected','country', 'family']).count()['class'].reset_index().rename(columns={
     'class':'counts'
     })
 
@@ -113,28 +117,28 @@ def timeX_family_countryY(data):
     db = teste
 
     # auxiliar variables for encoding fields
-    x_labels = db.sort_values('ano_coleta')['ano_coleta'].unique()
+    x_labels = db.sort_values('year_collected')['year_collected'].unique()
     xmin = x_labels.min()
     xmax = x_labels.max()
-    y_labels = db['pais'].unique()
+    y_labels = db['country'].unique()
     counts = db['counts'].unique()
     counts = list(range(min(counts), max(counts), 100))
 
     graph = alt.Chart(db, title='Registers Family by Country', height=500, width=1400).mark_circle().encode(
-        x= alt.X('ano_coleta', title='Sampling Year', 
+        x= alt.X('year_collected', title='Sampling Year', 
                 scale= alt.Scale(domain= [xmin,xmax])),
-        y= alt.Y('pais:N', title='country', 
+        y= alt.Y('country:N', title='country', 
                 scale= alt.Scale(domain= y_labels),
                 sort=alt.EncodingSortField('counts', op="count", order='descending')), 
         size=alt.Size('counts', title='Counts',
                     legend= None,
                     scale= alt.Scale(domain= counts, range=[20,120])), 
         order= alt.Order('counts', sort='descending'),  # smaller points in front
-    #     color= alt.Color('ordem', scale=alt.Scale(domain=ordens, range=cores)),  # old palette per order
-        color= alt.Color('familia',title= 'Family', 
+    #     color= alt.Color('order', scale=alt.Scale(domain=ordens, range=cores)),  # old palette per order
+        color= alt.Color('family',title= 'Family', 
                         legend= None,
                         scale= alt.Scale(domain= list(cores_familia.keys()), range= list(cores_familia.values()))),
-        tooltip= alt.Tooltip(['pais','ano_coleta','familia','counts'])
+        tooltip= alt.Tooltip(['country','year_collected','family','counts'])
     )
 
     graph = graph.configure_title(fontSize=16).configure_axis(
@@ -149,7 +153,8 @@ def timeX_family_countryY(data):
 
 def timeX_family_statesY(data):
 
-    teste = data.groupby(['ano_coleta','estado_ou_provincia', 'familia']).count()['class'].reset_index().rename(columns={
+    cores_familia = get_colors(st.session_state["app_version"])
+    teste = data.groupby(['year_collected','state', 'family']).count()['class'].reset_index().rename(columns={
     'class':'counts'
     })
 
@@ -157,28 +162,28 @@ def timeX_family_statesY(data):
     db = teste
 
     # auxiliar variables for encoding fields
-    x_labels = db.sort_values('ano_coleta')['ano_coleta'].unique()
+    x_labels = db.sort_values('year_collected')['year_collected'].unique()
     xmin = x_labels.min()
     xmax = x_labels.max()
-    y_labels = db['estado_ou_provincia'].unique()
+    y_labels = db['state'].unique()
     counts = db['counts'].unique()
     counts = list(range(min(counts), max(counts), 100))
 
     graph = alt.Chart(db, title='Registers Family by Brazilian States', height=1500, width=1400).mark_circle().encode(
-        x= alt.X('ano_coleta', title='Sampling Year', 
+        x= alt.X('year_collected', title='Sampling Year', 
                 scale= alt.Scale(domain= [xmin,xmax])),
-        y= alt.Y('estado_ou_provincia:N', title='states', 
+        y= alt.Y('state:N', title='states', 
                 scale= alt.Scale(domain= y_labels),
                 sort=alt.EncodingSortField('counts', op="count", order='descending')), 
         size=alt.Size('counts', title='Counts',
                     legend= None,
                     scale= alt.Scale(domain= counts, range=[20,120])), 
         order= alt.Order('counts', sort='descending'),  # smaller points in front
-    #     color= alt.Color('ordem', scale=alt.Scale(domain=ordens, range=cores)),  # old palette per order
-        color= alt.Color('familia',title= 'Family', 
+    #     color= alt.Color('order', scale=alt.Scale(domain=ordens, range=cores)),  # old palette per order
+        color= alt.Color('family',title= 'Family', 
                         legend= None,
                         scale= alt.Scale(domain= list(cores_familia.keys()), range= list(cores_familia.values()))),
-        tooltip= alt.Tooltip(['estado_ou_provincia','ano_coleta','familia','counts'])
+        tooltip= alt.Tooltip(['state','year_collected','family','counts'])
     )
 
     graph = graph.configure_title(fontSize=16).configure_axis(

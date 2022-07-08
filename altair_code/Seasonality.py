@@ -16,21 +16,21 @@ def timeX_monthY(data):
 
 
     # droping NAN
-    counts = data.dropna(subset=['ano_coleta', 'mes_coleta'], how='all')
+    counts = data.dropna(subset=['year_collected', 'month_collected'], how='all')
     # grouping per time and order
-    counts = counts.groupby(['ano_coleta', 'mes_coleta']).count()['class'].reset_index().rename(
+    counts = counts.groupby(['year_collected', 'month_collected']).count()['class'].reset_index().rename(
                                                                                 columns={'class':'counts'})
 
     # making sure month and year cols are int
-    counts['ano_coleta'] = counts['ano_coleta'].astype(int)
-    counts['mes_coleta'] = counts['mes_coleta'].astype(int)
+    counts['year_collected'] = counts['year_collected'].astype(int)
+    counts['month_collected'] = counts['month_collected'].astype(int)
 
     total = alt.Chart(counts, title='Total of collected specimens per month/year', width=1200, height=200).mark_rect().encode(
-            y = alt.Y('mes_coleta', type='ordinal', title='Collected Month',
-                    sort= alt.EncodingSortField('mes_coleta', order='descending')),
-            x = alt.X('ano_coleta:O', title='Collected Year',),
+            y = alt.Y('month_collected', type='ordinal', title='Collected Month',
+                    sort= alt.EncodingSortField('month_collected', order='descending')),
+            x = alt.X('year_collected:O', title='Collected Year',),
             color= alt.Color('counts', title='Counts', scale=alt.Scale(scheme="yellowgreenblue"),legend=None),
-            tooltip = alt.Tooltip(['counts', 'ano_coleta', 'mes_coleta'])
+            tooltip = alt.Tooltip(['counts', 'year_collected', 'month_collected'])
     )
 
     total.configure_title(fontSize=16).configure_axis(
