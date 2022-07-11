@@ -14,16 +14,15 @@ import altair as alt
 import streamlit as st
 from data_utils import *
 
-from src.MNViz_colors import *
 
 # habilitando renderizador para notebook
 # alt.renderers.enable('notebook')
 # alt.renderers.enable('default')
 
 
-def timeX_collector_countTypeY(NewTable: pd.DataFrame):
+def timeX_collector_countTypeY(NewTable: pd.DataFrame, app_version, colors):
 
-    cores_familia = get_colors(st.session_state["app_version"])
+    cores_familia = colors[0]
         # database
     db = NewTable.groupby(['year_collected', 'collector_full_name', 'type_status', 'family']).count()['class'].reset_index().rename(columns={'class':'counts'})
 
@@ -62,9 +61,9 @@ def timeX_collector_countTypeY(NewTable: pd.DataFrame):
 
     return graph
 
-def timeX_countTypeY(NewTable: pd.DataFrame):
+def timeX_countTypeY(NewTable: pd.DataFrame, app_version, colors):
 
-    cores_familia = get_colors(st.session_state["app_version"])
+    cores_familia = colors[0]
         # database
     db = NewTable.groupby(['year_collected', 'type_status']).count()['class'].reset_index().rename(columns={'class':'counts'})
 

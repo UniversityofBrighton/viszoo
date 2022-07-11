@@ -7,13 +7,11 @@ import altair as alt
 import streamlit as st
 from data_utils import get_colors
 
-# importing customized color palettes
-from src.MNViz_colors import *
 
 
-def timeX_collectorY_top50(data:pd.DataFrame):
+def timeX_collectorY_top50(data:pd.DataFrame, app_version, colors):
 
-    cores_familia = get_colors(st.session_state["app_version"])
+    cores_familia = colors[0]
     # disabling rows limit
     alt.data_transformers.disable_max_rows()
 
@@ -64,9 +62,9 @@ def timeX_collectorY_top50(data:pd.DataFrame):
 
     return graph
 
-def timeX_collectorY(data):
+def timeX_collectorY(data, app_version, colors):
 
-    cores_familia = get_colors(st.session_state["app_version"])
+    cores_familia = colors[0]
     teste = data.groupby(['collector_full_name','year_collected','family']).count()['class'].reset_index().rename(columns=
                                                                                             {'class':'counts'})
 
@@ -100,9 +98,9 @@ def timeX_collectorY(data):
     return graph
 
 
-def timeX_determinerY(data):
+def timeX_determinerY(data, app_version, colors):
 
-    cores_familia = get_colors(st.session_state["app_version"])
+    cores_familia = colors[0]
     teste = data.groupby(['determinator_full_name','year_collected','family']).count()['class'].reset_index().rename(columns=
                                                                                             {'class':'counts'})
 
@@ -132,9 +130,9 @@ def timeX_determinerY(data):
 
     return graph
 
-def timeX_determinerY_top50(data):
+def timeX_determinerY_top50(data, app_version, colors):
 
-    cores_familia = get_colors(st.session_state["app_version"])
+    cores_familia = colors[0]
     # disabling rows limit
     alt.data_transformers.disable_max_rows()
 

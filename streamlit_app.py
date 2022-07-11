@@ -1,8 +1,9 @@
 from importlib_metadata import version
 import streamlit as st
 
-from reptiles_app import reptile_app
-from crustacea_app import crustacea_app
+from core_app import core_app
+from crustaceas_app import crustacea_app
+from GBIF_app import GBIF_app
 
 #options
 st.set_page_config(layout='wide')
@@ -13,7 +14,8 @@ st.title('VisZoo Tool')
 
 app_versions = [
   'reptiles',
-  'crustacea'
+  'crustaceas',
+  'GBIF'
 ]
 
 if 'app_version' not in st.session_state:
@@ -24,7 +26,5 @@ if 'app_version' not in st.session_state:
     st.session_state['app_version'] = app_version
     st.experimental_rerun()
 
-elif st.session_state['app_version'] == 'crustacea':
-  crustacea_app()
-elif st.session_state['app_version'] == 'reptiles':
-  reptile_app()
+else:
+  core_app(st.session_state["app_version"])

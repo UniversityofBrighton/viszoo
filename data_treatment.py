@@ -88,7 +88,7 @@ def excel_to_dataframe_reptiles(file):
 
     # apply new types with respect to NaN
     for (key,value) in dtypes.items():
-        NewTable[key] = NewTable[key].apply(apply_type_with_nan, args=[value])
+        NewTable[key] = NewTable.loc[:,key].apply(apply_type_with_nan, args=[value])
 
 
     return NewTable
@@ -153,21 +153,15 @@ def excel_to_dataframe_crustacea(file):
     crustacea['min_depth'] = crustacea['min_depth'].apply(get_depth)
     crustacea['max_depth'] = crustacea['max_depth'].apply(get_depth)
 
-    # converting to float (keeping NaN)
-    crustacea['min_depth'] = crustacea['min_depth'].apply(convert2float)
-    crustacea['max_depth'] = crustacea['max_depth'].apply(convert2float)
-
 
     crustacea['lat'] = crustacea['lat'].apply(correct_lat)
     crustacea['long'] = crustacea['long'].apply(correct_long)
 
-    # converting to float
-    crustacea['lat'] = crustacea['lat'].apply(convert2float)
-    crustacea['long'] = crustacea['long'].apply(convert2float)
-
 
     # column selection for the resulting dataframe
     NewTable = crustacea[selected_columns]
+
+    NewTable = NewTable[NewTable['order'] == 'Decapoda']
 
     # apply new types with respect to NaN
     for (key,value) in dtypes.items():
@@ -175,3 +169,38 @@ def excel_to_dataframe_crustacea(file):
 
 
     return NewTable
+
+def GBIF_tsv_to_dataframe(file):
+
+
+    date_columns = ['eventDate', 'dateIdentified']
+    gbif = pd.read_csv(file, sep='\t', parse_dates=date_columns)
+
+
+    gbif.columns = [str(col).replace(r'\n','') for col in gbif.columns]
+
+    # 3 important dictionnaries and list initialised using column_dict.py
+    renames = dict()
+    selected_columns = list()
+    dtypes = dict()
+    
+    column_dict = column_dict_GBIF
+
+    for new_name, info in column_dict.items():
+        renames[info['file_name']] = new_name
+
+        if info['selected']:
+            selected_columns.append(new_name)
+            dtypes[new_name] = info['type']
+
+    gbif = gbif.rename(columns=renames)
+
+    gbif['year_determined'] = gbif['determined_date'].apply(lambda x : x.year)
+    gbif['year_collected'] = gbif['collected_date'].apply(lambda x : x.year)
+
+    gbif['month_determined'] = gbif['determined_date'].apply(lambda x : x.month)
+    gbif['month_collected'] = gbif['collected_date'].apply(lambda x : x.month)
+
+    gbif = gbif[selected_columns]
+
+    return gbif

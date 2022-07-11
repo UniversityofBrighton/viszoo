@@ -8,11 +8,10 @@ import altair as alt
 import streamlit as st
 from data_utils import *
 
-from src.MNViz_colors import *
 
-def timeX_family_countY(NewTable):
+def timeX_family_countY(NewTable, app_version, colors):
 
-    cores_familia = get_colors(st.session_state["app_version"])
+    cores_familia = colors[0]
     alt.renderers.enable('default')
     alt.data_transformers.disable_max_rows()
 
@@ -31,7 +30,7 @@ def timeX_family_countY(NewTable):
                 width=500, height=500, title='Registers by Families').mark_circle(
                                                                                     size=60).encode(
         x= alt.X('year_collected', title='Collected Year', scale=alt.Scale(domain=[time_min, time_max])),
-        y= alt.Y('family', type='nominal', title='Family {} {}'.format(time_min, time_max),
+        y= alt.Y('family', type='nominal', title='Family',
                 sort= alt.EncodingSortField(field='year_collected', op='min', order='ascending')),
         size= alt.Size('counts', title='Counts',
                     legend= None, scale=alt.Scale(range=[15,100])),
@@ -50,9 +49,9 @@ def timeX_family_countY(NewTable):
 
     return graph
 
-def timeX_family_countTypeY(NewTable: pd.DataFrame):
+def timeX_family_countTypeY(NewTable: pd.DataFrame, app_version, colors):
 
-    cores_familia = get_colors(st.session_state["app_version"])
+    cores_familia = colors[0]
     alt.renderers.enable('default')
     alt.data_transformers.disable_max_rows()
 
@@ -103,9 +102,9 @@ def timeX_family_countTypeY(NewTable: pd.DataFrame):
     return graph
 
 
-def timeX_genus_countTypeY(NewTable: pd.DataFrame):
+def timeX_genus_countTypeY(NewTable: pd.DataFrame, app_version, colors):
 
-    cores_familia = get_colors(st.session_state["app_version"])
+    cores_familia = colors[0]
         # database
     db = NewTable.groupby(['year_collected', 'genus', 'type_status', 'family']).count()['class'].reset_index().rename(columns={'class':'counts'})
 
@@ -149,9 +148,9 @@ def timeX_genus_countTypeY(NewTable: pd.DataFrame):
 
     return graph
 
-def timeX_order_countY(NewTable):
+def timeX_order_countY(NewTable, app_version, colors):
 
-    cores_familia = get_colors(st.session_state["app_version"])
+    cores_familia = colors[1]
     alt.renderers.enable('default')
     alt.data_transformers.disable_max_rows()
 
@@ -177,6 +176,46 @@ def timeX_order_countY(NewTable):
         color = alt.Color('order:O', title= 'Family',
                         legend= None, scale= alt.Scale(domain= list(cores_ordem.keys()), range=list(cores_ordem.values()))),
         tooltip = alt.Tooltip(['order', 'year_collected', 'counts'])
+    )
+
+    graph = graph.configure_title(fontSize=16).configure_axis(
+        labelFontSize=12,
+        titleFontSize=12
+    ).configure_legend(
+        labelFontSize=12,
+        titleFontSize=12
+    )
+
+    return graph
+
+def timeX_infraorder_countY(NewTable, app_version, colors):
+
+    cores_ordem = colors[1]
+    alt.renderers.enable('default')
+    alt.data_transformers.disable_max_rows()
+
+    teste = NewTable.groupby(['infraorder','year_collected']).count()['class'].reset_index().rename(
+                                                                                        columns={'class':'counts'})
+
+    teste = teste.dropna(subset=['year_collected'])
+    teste['infraorder'] = teste['infraorder'].astype(str)
+    teste['year_collected'] = teste['year_collected'].astype(int)
+
+    sort_list = teste.sort_values('year_collected')['year_collected'].unique()
+    time_min = sort_list.min()
+    time_max = sort_list.max()
+
+    graph = alt.Chart(teste,
+                width=500, height=500, title='Registers by Infraorder').mark_circle(
+                                                                                    size=60).encode(
+        x= alt.X('year_collected', title='Collected Year', scale=alt.Scale(domain=[time_min, time_max])),
+        y= alt.Y('infraorder', type='nominal', title='Infraorder',
+                sort= alt.EncodingSortField(field='year_collected', op='min', order='ascending')),
+        size= alt.Size('counts', title='Counts',
+                    legend= None, scale=alt.Scale(range=[15,100])),
+        color = alt.Color('infraorder:O', title= 'Family',
+                        legend= None, scale= alt.Scale(domain= list(cores_ordem.keys()), range=list(cores_ordem.values()))),
+        tooltip = alt.Tooltip(['infraorder', 'year_collected', 'counts'])
     )
 
     graph = graph.configure_title(fontSize=16).configure_axis(

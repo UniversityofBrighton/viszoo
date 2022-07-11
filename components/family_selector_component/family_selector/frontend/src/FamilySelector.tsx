@@ -62,8 +62,8 @@ class FamilySelector extends StreamlitComponentBase {
     const styleButton = {height:40, backgroundColor: primaryColor,paddingTop:10,flex:1,cursor:'pointer'}
 
     return (
-      <div style={{width:250, margin:0, padding:0,backgroundColor:themeBackgroundColor,borderRadius:12}}>
-        <div style={{height:250,overflowY:"scroll",borderRadius:10, paddingLeft:10,}}>
+      <div style={{maxWidth:250, minWidth:100, maxHeight:250, minHeight:80, margin:0, padding:0,backgroundColor:themeBackgroundColor,borderRadius:12}}>
+        <div style={{maxHeight:'inherit', minHeight: 'inherit',overflowY:"scroll",borderRadius:10, paddingLeft:10,}}>
           {familias_disp}
         </div>
         <div style={{flexDirection:'row', display:'flex'}}>

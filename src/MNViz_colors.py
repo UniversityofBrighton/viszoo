@@ -6,6 +6,22 @@ cores_ordem = {   # p.s.: Caudata is an error and should be removed
     'Crocodylia': '#284021'   
 }
 
+cores_infraordem = {
+    'Nan':'#000000',
+    'Ascacidae':'#fece5f',
+    'Anomura':'#007961',
+    'Achelata':'#7a2c39',
+    'Axiidea':'#b67262',
+    'Brachyura':'#ee4454',
+    'Caridea':'#3330b7',
+    'Gebiidea':'#d867be',
+    'Stenopodidea':'#b8e450',
+    'Astacidea':'#a0a3fd',
+    'Polychelida':'#deae9e',
+    'Grapsoidea':'#58b5e1',  # removed as asked by Cristiana Serejo (It should be reported as Brachyura)
+    'Xanthoidea':'#8b9388'
+}
+
 cores_familia_crustacea = {
     # known errors are marked in black
     'Nan':'#000000',

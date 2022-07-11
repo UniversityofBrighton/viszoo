@@ -87,3 +87,47 @@ column_dict_crustacea = {
 
 
 }
+
+column_dict_GBIF = {
+  'catalog_number': {'type': int, 'file_name': 'catalogNumber', 'selected': True},
+  'cataloged_date':{'type': str, 'file_name': '', 'selected': False},
+  'determined_date':{'type': str, 'file_name': 'dateIdentified', 'selected': False},
+  'collected_date':{'type': str, 'file_name': 'eventDate', 'selected': False},
+  'year_cataloged':{'type': int, 'file_name': '', 'selected': False},
+  'month_cataloged':{'type': int, 'file_name': '', 'selected': False},
+  'month_determined':{'type': int, 'file_name': '', 'selected': True},
+  'year_collected':{'type': int, 'file_name': '', 'selected': True},
+  'month_collected':{'type': int, 'file_name': '', 'selected': True},
+  'kingdom':{'type': str, 'file_name': 'kingdom', 'selected': True},
+  'phylum':{'type': str, 'file_name': 'Phylum1', 'selected': True},
+  'class':{'type': str, 'file_name': 'class', 'selected': True},
+  'order':{'type': str, 'file_name': 'order', 'selected': True},
+  'family':{'type': str, 'file_name': 'family', 'selected': True},
+  'genus_old':{'type': str, 'file_name': '', 'selected': False},
+  'genus':{'type': str, 'file_name': 'genus', 'selected': True},
+  'species_old':{'type': str, 'file_name': '', 'selected': False},
+  'species':{'type': str, 'file_name': 'species', 'selected': True},
+  'subspecies':{'type': str, 'file_name': '', 'selected': False},
+  'subspecies_old':{'type': str, 'file_name': '', 'selected': False},
+  'type_status':{'type': str, 'file_name': 'typeStatus', 'selected': True},
+  'determinator_full_name':{'type': str, 'file_name': 'identifiedBy', 'selected': True},
+  'collector_full_name':{'type': str, 'file_name': 'recordedBy', 'selected': True},
+  'min_depth':{'type': float, 'file_name': 'depth', 'selected': True},
+  'altitude':{'type': float, 'file_name': 'elevation', 'selected': True},
+  'qualifier':{'type': str, 'file_name': 'Qualifier1', 'selected': False},
+  'lat':{'type': float, 'file_name': 'decimalLatitude', 'selected': True},
+  'long':{'type': float, 'file_name': 'decimalLongitude', 'selected': True},
+  'municipio':{'type': str, 'file_name': '', 'selected': False},
+  'state':{'type': str, 'file_name': 'stateProvince', 'selected': True},
+  'country':{'type': str, 'file_name': 'countryCode', 'selected': True},
+  'continent':{'type': str, 'file_name': '', 'selected': False},
+  'region':{'type': str, 'file_name': '', 'selected': False},
+  'lost_in_fire':{'type': int, 'file_name': '', 'selected': False},
+  'year_determined':{'type': int, 'file_name': '', 'selected': True},
+  'author_full':{'type': str, 'file_name': '', 'selected': False},
+  'first_author':{'type': str, 'file_name': '', 'selected': False},
+  'locality':{'type': str, 'file_name': 'locality', 'selected': True},
+
+
+}
+

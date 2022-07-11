@@ -1,4 +1,5 @@
 
+from turtle import color
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -8,18 +9,21 @@ from collections import defaultdict
 import altair as alt
 
 from data_utils import *
-from src.MNViz_colors import *
 
 
 from itertools import compress
 
-def familyX_altitudeY(NewTable):
+def familyX_altitudeY(NewTable, app_version, colors):
 
-  cores_familia = get_colors(st.session_state["app_version"])
+  cores_familia = colors[0]
   alt.data_transformers.disable_max_rows()
 
   # subsetting
-  teste = NewTable[['altitude','family','order','suborder', 'year_collected', 'qualifier', 'catalog_number', 
+  teste = NewTable[['altitude','family','order',
+                    #'suborder',
+                    'year_collected', 
+                    #'qualifier',
+                    'catalog_number', 
                     'genus', 'species', 
                     #'subspecies'
                     ]].copy()
@@ -57,7 +61,7 @@ def familyX_altitudeY(NewTable):
               alt.Tooltip('genus', title='Genus'),
               alt.Tooltip('species', title='Species'),
               #alt.Tooltip('subspecies', title='Subspecies'),
-              alt.Tooltip('qualifier', title='qualifier'),
+              #alt.Tooltip('qualifier', title='qualifier'),
               alt.Tooltip('year_collected', title='year collected'),
               alt.Tooltip('altitude', title='altitude')],
 
@@ -66,11 +70,14 @@ def familyX_altitudeY(NewTable):
   return temp
 
 
-def genusX_altitudeY(data):
+def genusX_altitudeY(data, app_version, colors):
 
-  cores_familia = get_colors(st.session_state["app_version"])
-  data = data[['altitude','species','genus','order', 'suborder',
-                 'family', 'year_collected', 'qualifier', 'catalog_number', 
+  cores_familia = colors[0]
+  data = data[['altitude','species','genus','order', 
+                #'suborder',
+                 'family', 'year_collected', 
+                 #'qualifier',
+                  'catalog_number', 
                  #'subspecies'
                   ]]
 
@@ -92,8 +99,10 @@ def genusX_altitudeY(data):
                       scale= alt.Scale(domain=list(cores_familia.keys()), range= list(cores_familia.values()))),
       tooltip = alt.Tooltip(['catalog_number', 'genus','species',
                           #'subspecies', 
-                          'order', 'suborder',
-                              'qualifier', 'year_collected','altitude'])
+                          'order',
+                          #'suborder',
+                          #'qualifier',
+                          'year_collected','altitude'])
   )
 
   graph = graph.configure_title(fontSize=16).configure_axis(
@@ -108,9 +117,9 @@ def genusX_altitudeY(data):
   # g
   return graph
 
-def familyX_depthY(data):
+def familyX_depthY(data, app_version, colors):
 
-  cores_familia = get_colors(st.session_state["app_version"])
+  cores_familia = colors[0]
   # subsetting
   teste = data[['min_depth','family','infraorder', 'year_collected', 'qualifier', 'catalog_number', 
                     'genus', 'species', 'collector_full_name', 'country','state','locality', 'type_status']].copy()
