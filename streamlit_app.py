@@ -2,8 +2,6 @@ from importlib_metadata import version
 import streamlit as st
 
 from core_app import core_app
-from crustaceas_app import crustacea_app
-from GBIF_app import GBIF_app
 
 #options
 st.set_page_config(layout='wide')

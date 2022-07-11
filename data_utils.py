@@ -78,7 +78,6 @@ def zero_one_to_hex(value, sat):
   h = value
   s = sat
   v = 1.15 - sat/2
-  print(h)
 
   rgb = colorsys.hsv_to_rgb(h,s,v)
 
@@ -113,7 +112,6 @@ def create_color_palettes(data, app_version):
       family_names = order_groups[orders_name[i]].index
       family_counts = order_groups[orders_name[i]].to_numpy()
       
-      print('values inside:')
       family_colors = counts_to_color(family_counts, order_intervals[i], centered_values=True, return_interval=False, equidistant=True, changeSaturation=True)
       for k in range(len(family_colors)):
 
