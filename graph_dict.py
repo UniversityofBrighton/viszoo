@@ -30,7 +30,6 @@ def get_graph_dicts(app_version):
     graphs_space = dict()
     graphs_space['altitude per family'] = familyX_altitudeY
     graphs_space['altitude per genus'] = genusX_altitudeY
-    graphs_space['geographic representation'] = geographic_alt
 
   elif app_version == 'crustaceas':
     graphs_time = dict()
@@ -51,7 +50,6 @@ def get_graph_dicts(app_version):
     # graphs available in the "space" section
     graphs_space = dict()
     graphs_space['depth per family'] = familyX_depthY
-    graphs_space['geographic representation'] = geographic_alt
     
   elif app_version == 'GBIF':
     graphs_time = dict()
@@ -71,6 +69,5 @@ def get_graph_dicts(app_version):
     graphs_space = dict()
     graphs_space['altitude per family'] = familyX_altitudeY
     graphs_space['altitude per genus'] = genusX_altitudeY
-    graphs_space['geographic representation'] = geographic_alt
 
   return graphs_time, graphs_space
