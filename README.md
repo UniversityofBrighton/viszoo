@@ -22,7 +22,7 @@ The software is designed to help your curate your data by finding domain-specifi
 - ### Custom Column Mapping
 
   Have a look at the file custom_mapping.csv in the ressources folder. (It is the one used by default when you do not provide any for GBIF data).
-  If you want to be able to upload your custom column mapping, you need to chose the 'GBIF' app version and ceck the 'use custom data and mapping' checkbox
+  If you want to be able to upload your custom column mapping, you need to choose the 'GBIF' app version and ceck the 'use custom data and mapping' checkbox
 
   #### 'field' and 'name in your file':
   All fields in the "field" column need a mapping in your file (the "name in your file" column), this means they need to know in which column of your file they are getting the data.
