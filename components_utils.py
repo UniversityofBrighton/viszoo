@@ -32,50 +32,23 @@ def load_components():
 
   return family_selector, type_selector
 
-from data_utils import create_color_palettes
 
 def get_selectors(data, app_version, colors):
 
-# loading families informations and color
+  # loading families informations and color
   families, orders = colors
-  st.session_state["families"] = families
-  families_name = list(families.keys())
-  families_color = list(families.values())
-  list_families = list()
-
-
-  # creates the family list for the family selector
-  for index in range(len(families_name)):
-    fam = dict()
-    fam["name"] = families_name[index]
-    fam["color"] = families_color[index]
-    fam["selected"] = True
-    list_families.append(fam)
-
-  st.session_state["orders"] = orders
-  orders_name = list(orders.keys())
-  orders_color = list(orders.values())
-  list_orders = list()
-
-  # creates the family list for the family selector
-  for index in range(len(orders_name)):
-    ord = dict()
-    ord["name"] = orders_name[index]
-    ord["color"] = orders_color[index]
-    ord["selected"] = True
-    list_orders.append(ord)
+  list_families = get_selection_list(families)
+  list_orders = get_selection_list(orders)
+  list_types = list()
 
   # handling Types, creating the Type list for the Type selector
   type_names = data['type_status'].unique()
-  list_types = list()
   for index in range(len(type_names)):
     new_type = dict()
     new_type['name'] = str(type_names[index])
     new_type['shape'] = "square"
     new_type['selected'] = True
     list_types.append(new_type)
-
-
 
   if app_version == 'reptiles':
     return [
@@ -131,6 +104,19 @@ def get_selectors(data, app_version, colors):
         'list':list_types
       }
     ]
+
+def get_selection_list(colors_list):
+  list_name = list(colors_list.keys())
+  list_color = list(colors_list.values())
+  select_list = list()
+
+  for index in range(len(list_name)):
+    el = dict()
+    el["name"] = list_name[index]
+    el["color"] = list_color[index]
+    el["selected"] = True
+    select_list.append(el)
+  return select_list
 
 def get_filters_out(selectors_components):
   list_selector_output = list()

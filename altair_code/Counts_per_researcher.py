@@ -4,8 +4,6 @@ import pandas as pd
 
 # visualization
 import altair as alt
-import streamlit as st
-from data_utils import get_colors
 
 
 

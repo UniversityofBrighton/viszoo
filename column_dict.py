@@ -1,6 +1,11 @@
 # declarations of useful variables
 
 # english translation dictionnary
+import json
+import os
+import pandas as pd
+
+
 column_dict_reptiles = {
   'catalog_number': {'type': int, 'file_name': 'NumeroDeCatalogo', 'selected': True},
   'cataloged_date':{'type': str, 'file_name': 'DataDeEntrada', 'selected': False},
@@ -128,6 +133,34 @@ column_dict_GBIF = {
   'first_author':{'type': str, 'file_name': '', 'selected': False},
   'locality':{'type': str, 'file_name': 'locality', 'selected': True},
 
-
 }
 
+def get_selected_columns():
+  return {
+  'catalog_number': True,
+  'year_collected': True,
+  'month_collected': True,
+  'class': True,
+  'order': True,
+  'family': True,
+  'genus': True,
+  'type_status': True,
+  'determinator_full_name': True,
+  'collector_full_name': True,
+  'min_depth': True,
+  'altitude': True,
+  'lat': True,
+  'long': True,
+  'state': True,
+  'country': True,
+}
+
+def get_custom_mapping():
+  root_dir = os.path.dirname(os.path.abspath(__file__))
+  json_path = os.path.join('ressources','custom_mapping.csv')
+
+  file_path = os.path.join(root_dir,json_path)
+
+  return pd.read_csv(file_path, index_col=False, header=0)
+
+custom_mapping = get_custom_mapping()

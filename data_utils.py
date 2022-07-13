@@ -3,6 +3,15 @@ import numpy as np
 import colorsys
 from src.MNViz_colors import cores_familia_crustacea, cores_familia_reptiles, cores_ordem, cores_infraordem
 
+sepoptions = [',',';','\t']
+
+def get_file_extension(app_version):
+  if app_version == 'reptiles' or app_version=='crustaceas':
+    ext = 'xlsx'
+  elif app_version == 'GBIF':
+    ext = 'csv'
+  return ext
+
 #there are 5 positional arguments
 def filter_data(data:pd.DataFrame, list_filter_out, time1, time2):
 
@@ -15,27 +24,42 @@ def filter_data(data:pd.DataFrame, list_filter_out, time1, time2):
 
   return filtered_data
 
+# this functions creates color_palettes for orders and families 
+def create_color_palettes(data, app_version):
 
-def create_map_data(data:pd.DataFrame):
-  renames = {
-    'long':'lon'
-  }
+  if app_version == 'reptiles':
+    core_family = cores_familia_reptiles
+    core_ordem = cores_ordem
+  elif app_version == 'crustaceas':
+    core_family = cores_familia_crustacea
+    core_ordem = cores_infraordem
+  else:
+    data.dropna(subset=['order','family'], inplace=True)
+    order_groups = data.groupby(['order','family']).count()['class']
+    orders = data.groupby(['order','family']).count().reset_index().groupby(['order']).count()['class']
 
-  to_keep = [
-    'lon',
-    'lat',
-  ]
+    orders_name = orders.index
+    orders_counts = orders.to_numpy()
 
-  data =  data.rename(columns=renames)[to_keep][:3000]
-  data.dropna(subset=to_keep, inplace=True)
+    core_ordem = dict()
+    core_family = dict()
 
-  return data
+    order_colors, order_intervals = counts_to_color(orders_counts, [0,0.95], centered_values=False, return_interval=True, equidistant=False)
 
-def get_colors(app_version):
-  if app_version == 'crustacea':
-      return cores_familia_crustacea
-  elif app_version == 'reptiles':
-      return cores_familia_reptiles
+    for i in range(len(order_colors)):
+      core_ordem[orders_name[i]] = order_colors[i]
+      
+      family_names = order_groups[orders_name[i]].index
+      family_counts = order_groups[orders_name[i]].to_numpy()
+      
+      family_colors = counts_to_color(family_counts, order_intervals[i], centered_values=True, return_interval=False, equidistant=True, changeSaturation=True)
+      # changeSaturation=True means that the saturation is going to change between the colors
+      for k in range(len(family_colors)):
+
+        core_family[family_names[k]] = family_colors[k]
+    
+  return core_family, core_ordem
+
 
 def counts_to_color(counts, interval, centered_values=False, return_interval=True, equidistant=False, changeSaturation=False):
     
@@ -74,6 +98,7 @@ def counts_to_color(counts, interval, centered_values=False, return_interval=Tru
     else:
         return colors
 
+# give a value between 0 and 1 for hue, and 0 and 1 for saturation (which also impacts value)
 def zero_one_to_hex(value, sat):
   h = value
   s = sat
@@ -83,45 +108,3 @@ def zero_one_to_hex(value, sat):
 
   res = '#{:02x}{:02x}{:02x}'.format(int(rgb[0]*255),int(rgb[1]*255),int(rgb[2]*255))
   return res
-
-
-def create_color_palettes(data, app_version):
-
-  if app_version == 'reptiles':
-    core_family = cores_familia_reptiles
-    core_ordem = cores_ordem
-  elif app_version == 'crustaceas':
-    core_family = cores_familia_crustacea
-    core_ordem = cores_infraordem
-  else:
-    data.dropna(subset=['order','family'], inplace=True)
-    order_groups = data.groupby(['order','family']).count()['class']
-    orders = data.groupby(['order','family']).count().reset_index().groupby(['order']).count()['class']
-
-    orders_name = orders.index
-    orders_counts = orders.to_numpy()
-
-    core_ordem = dict()
-    core_family = dict()
-
-    order_colors, order_intervals = counts_to_color(orders_counts, [0,0.95], centered_values=False, return_interval=True, equidistant=False)
-
-    for i in range(len(order_colors)):
-      core_ordem[orders_name[i]] = order_colors[i]
-      
-      family_names = order_groups[orders_name[i]].index
-      family_counts = order_groups[orders_name[i]].to_numpy()
-      
-      family_colors = counts_to_color(family_counts, order_intervals[i], centered_values=True, return_interval=False, equidistant=True, changeSaturation=True)
-      for k in range(len(family_colors)):
-
-        core_family[family_names[k]] = family_colors[k]
-    
-  return core_family, core_ordem
-
-def get_file_extension(app_version):
-  if app_version == 'reptiles' or app_version=='crustaceas':
-    ext = 'xlsx'
-  elif app_version == 'GBIF':
-    ext = 'csv'
-  return ext

@@ -3,9 +3,21 @@ import numpy as np
 import pandas as pd
 
 # proprietary functions in ./src/MNViz.py
-from src.MNViz import *
 from column_dict import *
 from treatment_utils import *
+
+def file_to_dataframe(state, app_version):
+    file = state['file']
+    if 'custom_mapping_file' not in state:
+        if app_version == 'reptiles':
+            data = excel_to_dataframe_reptiles(file)
+        elif app_version == 'crustaceas':
+            data = excel_to_dataframe_crustacea(file)
+        elif app_version == 'GBIF':
+            data = GBIF_tsv_to_dataframe(file)
+    else:
+        data = custom_file_to_dataframe(file, state['custom_mapping_file'], state['separator'])
+    return data
 
 
 # function to go from the excel file to the pandas dataframe used for the app
@@ -176,7 +188,6 @@ def GBIF_tsv_to_dataframe(file):
     date_columns = ['eventDate', 'dateIdentified']
     gbif = pd.read_csv(file, sep='\t', parse_dates=date_columns)
 
-
     gbif.columns = [str(col).replace(r'\n','') for col in gbif.columns]
 
     # 3 important dictionnaries and list initialised using column_dict.py
@@ -193,14 +204,73 @@ def GBIF_tsv_to_dataframe(file):
             selected_columns.append(new_name)
             dtypes[new_name] = info['type']
 
-    gbif = gbif.rename(columns=renames)
+    return dataframe_treatment(gbif, renames, dtypes, selected_columns)
 
-    gbif['year_determined'] = gbif['determined_date'].apply(lambda x : x.year)
-    gbif['year_collected'] = gbif['collected_date'].apply(lambda x : x.year)
+def update_dtypes(dtypes, row):
+    type = row["type"]
+    name = row["field"]
 
-    gbif['month_determined'] = gbif['determined_date'].apply(lambda x : x.month)
-    gbif['month_collected'] = gbif['collected_date'].apply(lambda x : x.month)
+    if type == "text":
+        dtypes[name] = str
+    elif type == "integer":
+        dtypes[name] = int
+    elif type == "float":
+        dtypes[name] = float
 
-    gbif = gbif[selected_columns]
+    return dtypes
 
-    return gbif
+def dataframe_treatment(data, renames, dtypes, selected_columns):
+
+    data = data.rename(columns=renames)
+
+    if 'determiner_first_name' in list(renames.values()) and 'determiner_last_name' in list(renames.values()):
+        data = create_column_full_name(data, 'determiner_last_name', 'determiner_first_name', 'determinator_full_name')
+
+    if 'collector_first_name' in list(renames.values()) and 'collector_last_name' in list(renames.values()):
+        data = create_column_full_name(data, 'collector_last_name', 'collector_first_name', 'collector_full_name')
+
+    data['year_determined'] = data['determined_date'].apply(lambda x : x.year)
+    data['year_collected'] = data['collected_date'].apply(lambda x : x.year)
+
+    data['month_determined'] = data['determined_date'].apply(lambda x : x.month)
+    data['month_collected'] = data['collected_date'].apply(lambda x : x.month)
+
+
+    data = data[selected_columns]
+
+    for (key,value) in dtypes.items():
+        data[key] = data[key].apply(apply_type_with_nan, args=[value])
+
+    return data
+
+def read_custom_mapping(custom_mapping_file):
+
+    mapping = pd.read_csv(custom_mapping_file, index_col=False, header=0)
+
+    date_columns = mapping.where(mapping["type"] == 'date')["name in your file"].dropna().tolist()
+    print(date_columns)
+
+    renames = dict()
+    dtypes = dict()
+
+    selected_columns = get_selected_columns()
+
+    for i in mapping.index:
+        if mapping.loc[i, "name in your file"] != '':
+            renames[mapping.loc[i,"name in your file"]] = mapping.loc[i,"field"]
+        if mapping.loc[i,'selected']:
+            selected_columns[mapping.loc[i,"field"]] = True
+            dtypes = update_dtypes(dtypes, mapping.loc[i])
+
+    return date_columns, renames, dtypes, selected_columns
+
+
+def custom_file_to_dataframe(file, custom_mapping_file, separator):
+    
+    date_columns, renames, dtypes, selected_columns = read_custom_mapping(custom_mapping_file)
+
+    data = pd.read_csv(file, sep=separator,parse_dates=date_columns)
+
+    data = dataframe_treatment(data, renames, dtypes, selected_columns)
+
+    return data

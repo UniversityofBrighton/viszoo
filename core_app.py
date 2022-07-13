@@ -1,31 +1,39 @@
 import streamlit as st
-import streamlit.components.v1 as components
 import numpy as np
-import os
-from data_utils import *
+
 from graph_dict import get_graph_dicts
-from src.MNViz_colors import *
+
+from data_treatment import file_to_dataframe
+from data_utils import create_color_palettes, get_file_extension, filter_data, sepoptions
 from components_utils import load_components, get_selectors, get_filters_out
 
-from data_treatment import *
-from altair_code.Seasonality import *
-from altair_code.Altitude import *
-from altair_code.time_spacial import *
-from altair_code.Family_counts_per_year import *
-from altair_code.Counts_per_researcher import *
-from altair_code.Type_counts import *
+from altair_code.time_spacial import geographic_alt
 
-def core_app(app_version):
+def core_app(app_version, custom):
 
   if 'file_uploaded' not in st.session_state:
     
     file_ext = get_file_extension(app_version)
 
     # this is the first thing to show up when the app loads
-    file = st.file_uploader(label='upload your file', type=[file_ext], accept_multiple_files=False)
-    if file != None:
+    upl1, right_side = st.columns((5,1))
+
+    with upl1:
+      file = upl1.file_uploader(label='upload your file', type=[file_ext], accept_multiple_files=False)
+   
+    if custom:
+      with right_side:
+        separator = st.selectbox(label='csv separator', options=sepoptions, format_func=lambda x : 'tab' if (x == '\t') else x, index=2)
+      custom_mapping_file = st.file_uploader(label='upload your custom mapping (refresh the page for explanations)', type=['csv'], accept_multiple_files=False)
+    button_pressed = st.button(label='load application')
+
+    if file != None and button_pressed:
       st.session_state['file'] = file
-      st.session_state['file_uploaded'] = 'oui'
+      st.session_state['file_uploaded'] = 'true'
+      if custom:
+        if custom_mapping_file != None:
+          st.session_state['custom_mapping_file'] = custom_mapping_file
+          st.session_state['separator'] = separator
       st.experimental_rerun()
 
   else:
@@ -34,20 +42,13 @@ def core_app(app_version):
 
       # this sections plays when you just uploaded your data
 
-
       #loading the pandas dataframe from the excel file provided
-      if app_version == 'reptiles':
-        data = excel_to_dataframe_reptiles(st.session_state['file'])
-      elif app_version == 'crustaceas':
-        data = excel_to_dataframe_crustacea(st.session_state["file"])
-      elif app_version == 'GBIF':
-        data = GBIF_tsv_to_dataframe(st.session_state["file"])
+      data = file_to_dataframe(st.session_state, app_version)
       st.session_state['data'] = data
 
       family_selector, type_selector = load_components()
       st.session_state['family_selector'] = family_selector
       st.session_state['type_selector'] = type_selector
-
 
       colors = create_color_palettes(data, app_version)
       st.session_state['families'], st.session_state['orders'] = colors
@@ -65,10 +66,10 @@ def core_app(app_version):
       st.session_state["graphs_time"], st.session_state["graphs_space"] = get_graph_dicts(app_version)
 
       # the data is now loaded and the app is ready to work
-      st.session_state['data_loaded'] = "oui"
+      st.session_state['data_loaded'] = "true"
 
-      # this plays whenever the app is refreshed and the data has already been loaded,
-      # I put a lot of variables in session_state so that it does not have to compute them again
+    # this plays whenever the app is refreshed and the data has already been loaded,
+    # I put a lot of variables in session_state so that it does not have to compute them again
 
     min_year = st.session_state['min_year']
     max_year = st.session_state['max_year']

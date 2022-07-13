@@ -3,6 +3,7 @@ from altair_code.Counts_per_researcher import *
 from altair_code.Family_counts_per_year import *
 from altair_code.time_spacial import *
 from altair_code.Type_counts import *
+from altair_code.custom_chart import custom_chart
 
 
 def get_graph_dicts(app_version):
@@ -25,6 +26,7 @@ def get_graph_dicts(app_version):
     graphs_time['Registers Family by continent'] = timeX_family_continentY
     graphs_time['Registers Family by country'] = timeX_family_countryY
     graphs_time['Registers Family by Brazilian States'] = timeX_family_statesY
+    graphs_time['custom chart'] = custom_chart
     # graphs_time['seasonality'] = timeX_monthY
     # graphs available in the "space" section
     graphs_space = dict()
@@ -46,6 +48,7 @@ def get_graph_dicts(app_version):
     graphs_time['Registers Family by continent'] = timeX_family_continentY
     graphs_time['Registers Family by country'] = timeX_family_countryY
     graphs_time['Registers Family by Brazilian States'] = timeX_family_statesY
+    graphs_time['custom chart'] = custom_chart
     # graphs_time['seasonality'] = timeX_monthY
     # graphs available in the "space" section
     graphs_space = dict()
@@ -64,6 +67,7 @@ def get_graph_dicts(app_version):
     graphs_time['Registers by Order'] = timeX_order_countY
     graphs_time['Registers by Type'] = timeX_countTypeY
     graphs_time['Registers Family by country'] = timeX_family_countryY
+    graphs_time['custom chart'] = custom_chart
     # graphs_time['seasonality'] = timeX_monthY
     # graphs available in the "space" section
     graphs_space = dict()
