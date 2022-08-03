@@ -82,6 +82,7 @@ def lost_in_fire(description):
     else:
         return 0            
 
+#from a column of first_name and a column of last_name, creates a new full_name columns and erases the two previous columns
 def create_column_full_name(data:pd.DataFrame, column_first_name, column_last_name, column_full_name):
 
     data[column_first_name] = data[column_first_name].apply(treat_names)

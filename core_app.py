@@ -42,16 +42,21 @@ def core_app(app_version, custom):
 
       # this sections plays when you just uploaded your data
 
-      #loading the pandas dataframe from the excel file provided
+      #loading the pandas dataframe from the excel or csv file provided
       data = file_to_dataframe(st.session_state, app_version)
       st.session_state['data'] = data
 
+      # streamlit has to load the custom components
       family_selector, type_selector = load_components()
       st.session_state['family_selector'] = family_selector
       st.session_state['type_selector'] = type_selector
 
+      #color_palettes are loaded, if custom data is used, then a custom function creates the color palettes
+      #otherwise, pre defined color palettes are used
       colors = create_color_palettes(data, app_version)
       st.session_state['families'], st.session_state['orders'] = colors
+
+      #components specific to the app version are initialised and stored in a list variable
       st.session_state['selectors_components'] = get_selectors(data, app_version, colors)
 
       #getting years for the slider
@@ -63,13 +68,14 @@ def core_app(app_version, custom):
       st.session_state['min_year'] = int(min(years))
       st.session_state['max_year'] = int(max(years))
 
+      #the graphs available for this app_version are loaded
       st.session_state["graphs_time"], st.session_state["graphs_space"] = get_graph_dicts(app_version)
 
       # the data is now loaded and the app is ready to work
       st.session_state['data_loaded'] = "true"
 
     # this plays whenever the app is refreshed and the data has already been loaded,
-    # I put a lot of variables in session_state so that it does not have to compute them again
+    # I put a lot of variables in session_state so that it does not have to compute them again on each rerun
 
     min_year = st.session_state['min_year']
     max_year = st.session_state['max_year']
@@ -88,7 +94,7 @@ def core_app(app_version, custom):
     selectors_components = st.session_state['selectors_components']
     
 
-    # declarations
+    # variable declarations
     default_min_year = 1930
   
 
@@ -125,4 +131,5 @@ def core_app(app_version, custom):
     time_col1.altair_chart(chart_time, True)
     space_col1.altair_chart(chart_space1, True)
     space_col2.altair_chart(chart_space2, True)
+
     # all done

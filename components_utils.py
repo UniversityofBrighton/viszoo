@@ -33,6 +33,7 @@ def load_components():
   return family_selector, type_selector
 
 
+#depending on each app_version, different selectors will be loaded
 def get_selectors(data, app_version, colors):
 
   # loading families informations and color
@@ -105,9 +106,10 @@ def get_selectors(data, app_version, colors):
       }
     ]
 
-def get_selection_list(colors_list):
-  list_name = list(colors_list.keys())
-  list_color = list(colors_list.values())
+#this function transforms a dict into a list of dict adding a selection field
+def get_selection_list(colors_dict):
+  list_name = list(colors_dict.keys())
+  list_color = list(colors_dict.values())
   select_list = list()
 
   for index in range(len(list_name)):
@@ -118,6 +120,7 @@ def get_selection_list(colors_list):
     select_list.append(el)
   return select_list
 
+#this function transforms the output of the selector components in filter format used in the filter function
 def get_filters_out(selectors_components):
   list_selector_output = list()
   for selector in selectors_components:

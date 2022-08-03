@@ -6,6 +6,7 @@ import pandas as pd
 from column_dict import *
 from treatment_utils import *
 
+#depending on the app_version, a different data treatment is applied
 def file_to_dataframe(state, app_version):
     file = state['file']
     if 'custom_mapping_file' not in state:
@@ -182,6 +183,7 @@ def excel_to_dataframe_crustacea(file):
 
     return NewTable
 
+# function to go from the csv file to the pandas dataframe used for the app
 def GBIF_tsv_to_dataframe(file):
 
 
@@ -206,6 +208,7 @@ def GBIF_tsv_to_dataframe(file):
 
     return dataframe_treatment(gbif, renames, dtypes, selected_columns)
 
+#function to transform the 'type' column in custom column mappings to python types
 def update_dtypes(dtypes, row):
     type = row["type"]
     name = row["field"]
@@ -219,6 +222,7 @@ def update_dtypes(dtypes, row):
 
     return dtypes
 
+#applies renames, handle determiner and collector names, and selects final columns on a given dataframe
 def dataframe_treatment(data, renames, dtypes, selected_columns):
 
     data = data.rename(columns=renames)
@@ -243,6 +247,7 @@ def dataframe_treatment(data, renames, dtypes, selected_columns):
 
     return data
 
+#reads the custom column mapping file
 def read_custom_mapping(custom_mapping_file):
 
     mapping = pd.read_csv(custom_mapping_file, index_col=False, header=0)
@@ -264,7 +269,7 @@ def read_custom_mapping(custom_mapping_file):
 
     return date_columns, renames, dtypes, selected_columns
 
-
+# function to go from a custom csv file to the pandas dataframe used for the app
 def custom_file_to_dataframe(file, custom_mapping_file, separator):
     
     date_columns, renames, dtypes, selected_columns = read_custom_mapping(custom_mapping_file)

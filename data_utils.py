@@ -60,7 +60,7 @@ def create_color_palettes(data, app_version):
     
   return core_family, core_ordem
 
-
+#this function is used to create color palettes with color ranges proportionnal to the number of families and orders
 def counts_to_color(counts, interval, centered_values=False, return_interval=True, equidistant=False, changeSaturation=False):
     
     if centered_values:
@@ -98,7 +98,7 @@ def counts_to_color(counts, interval, centered_values=False, return_interval=Tru
     else:
         return colors
 
-# give a value between 0 and 1 for hue, and 0 and 1 for saturation (which also impacts value)
+# from a value between 0 and 1 for hue, and between 0 and 1 for saturation (which also impacts value), returns an rgb hexadecimal color for the custom components css 
 def zero_one_to_hex(value, sat):
   h = value
   s = sat
