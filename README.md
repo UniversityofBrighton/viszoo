@@ -85,7 +85,8 @@ The software is designed to help your curate your data by finding domain-specifi
     If you need to add some notes for yourself in the file, it is not used by the software.
 
 ## Developer Guide
-  (documentation in progress)
+  > (documentation in progress)
+  
   There are 3 app_versions: reptiles, crustaceas and GBIF.
   
 - ### How the software works
@@ -96,14 +97,16 @@ The software is designed to help your curate your data by finding domain-specifi
   The Viz_Zoo software loads the uploaded data and stores it as a pandas DataFrame, whenever the user applies any filter (time slider, order and family selectors, etc) the data is filtered, and [altair](https://altair-viz.github.io/) visualisations are applied on the filtered data and are displayed using Streamlit's API.
   
   Streamlit only has a few input widgets (buttons, selectors, ...) but you can make your own custom components using React.js, this is how the filter widgets on the left sidebar have been created. Those selectors let you filter for order, family, type.
+  
+  **A functions analysis is available [here](documentation/functions_analysis.drawio.svg)**
 
-- ### graph_dict.py
+  #### graph_dict.py
   Python file that indicates for each app_version, which altair visualisations are available in the web app selectors.
   
       for exemple, crustaceas app_version does not have access to the altitude graphs, as they only have depth information
   For each app_version, you will need to give them access to any new altair visualisation you create by adding their name in this file.
   
 
-- ### column_dict.py
+  #### column_dict.py
   Column mappings used when no custom one is provided, there is one for each app_version.
   These mappings have been tailored for specific excel files used by experts, make sure changing this file does not break the software.
