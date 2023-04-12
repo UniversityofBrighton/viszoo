@@ -8,7 +8,7 @@ If you're here for **custom column mapping**, click [here](#custom-column-mappin
 
 ## Software Presentation
 
-This software was built as a prototype to demonstrate the point of a *neat pile of charts* as in this [thesis](no-link-yet)
+This software was built as a prototype to demonstrate the point of a ***neat pile of charts***, since then further work has been done and can be found [here](https://github.com/aslamedeiros/Vis_Zoo---Fase-1)
 
 Upload your zoology register data to the app and use the different charts and numerous filters to visualise your registers through space and time lenses.
 The software is designed to help your curate your data by finding domain-specific inconsistencies, it is therefore aimed at rather knowledgable users in their field.
